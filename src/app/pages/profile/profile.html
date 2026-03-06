@@ -1,0 +1,127 @@
+<div class="profile-page">
+  <div class="profile-container">
+
+    <!-- Top: Avatar + Info -->
+    <div class="profile-hero">
+      <div class="avatar-section">
+        <div class="avatar-wrap" (click)="avatarInput.click()">
+          <img [src]="avatarPreview || user.avatar || 'UnderwavLogo1.png'" class="avatar-img" alt="Avatar">
+          <div class="avatar-ring"></div>
+          <div class="avatar-overlay">Change Photo</div>
+          <input #avatarInput type="file" accept="image/*" (change)="onAvatarChange($event)" hidden>
+        </div>
+        <button class="btn-change-avatar" (click)="avatarInput.click()">📷 Change Photo</button>
+      </div>
+
+      <div class="hero-info">
+        <h1 class="hero-name">{{ user.username || 'Anonymous' }}</h1>
+        <p class="hero-location" *ngIf="user.city || user.country">
+          ◎ {{ user.city }} {{ user.country }}
+        </p>
+        <p class="hero-bio">{{ user.bio || 'No bio yet.' }}</p>
+        <div class="hero-meta d-flex gap-4 mt-3">
+          <div class="meta-item" *ngIf="user.email && user.show_email">
+            <span class="meta-label">Email</span>
+            <span class="meta-value">{{ user.email }}</span>
+          </div>
+          <div class="meta-item" *ngIf="user.first_name || user.last_name">
+            <span class="meta-label">Name</span>
+            <span class="meta-value">{{ user.first_name }} {{ user.last_name }}</span>
+          </div>
+          <div class="meta-item" *ngIf="user.phone">
+            <span class="meta-label">Phone</span>
+            <span class="meta-value">{{ user.phone }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="section-divider"></div>
+
+    <!-- Edit Profile -->
+    <div class="profile-section">
+      <h2 class="section-title">Edit Profile</h2>
+      <form #profileForm="ngForm" (ngSubmit)="saveProfile(profileForm.value)">
+        <div class="fields-grid">
+          <div class="field-group">
+            <label class="field-label">Username</label>
+            <input type="text" class="field-input" name="username" [(ngModel)]="user.username">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Email</label>
+            <div class="field-with-toggle">
+              <input type="email" class="field-input" [value]="user.email" disabled>
+              <button type="button" class="visibility-btn" [class.visibility-active]="user.show_email"
+                (click)="user.show_email = !user.show_email">
+                {{ user.show_email ? ' Visible' : ' Hidden' }}
+              </button>
+            </div>
+            <small class="field-hint">Contact support to change your email. Toggle to show/hide on public
+              profile.</small>
+            <!-- hidden input so ngForm picks up show_email -->
+            <input type="hidden" name="show_email" [(ngModel)]="user.show_email">
+          </div>
+          <div class="field-group">
+            <label class="field-label">First Name</label>
+            <input type="text" class="field-input" name="first_name" [(ngModel)]="user.first_name">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Last Name</label>
+            <input type="text" class="field-input" name="last_name" [(ngModel)]="user.last_name">
+          </div>
+          <div class="field-group">
+            <label class="field-label">City</label>
+            <input type="text" class="field-input" name="city" [(ngModel)]="user.city">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Country</label>
+            <input type="text" class="field-input" name="country" [(ngModel)]="user.country">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Phone</label>
+            <input type="text" class="field-input" name="phone" [(ngModel)]="user.phone">
+          </div>
+          <div class="field-group field-full">
+            <label class="field-label">Bio</label>
+            <textarea class="field-input field-textarea" name="bio" rows="3" [(ngModel)]="user.bio"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary-action mt-4">Save Changes</button>
+      </form>
+    </div>
+
+    <!-- Divider -->
+    <div class="section-divider"></div>
+
+    <!-- Change Password -->
+    <div class="profile-section">
+      <h2 class="section-title">Change Password</h2>
+      <form #passwordForm="ngForm"
+        (ngSubmit)="changePassword(passwordForm.value.currentPassword, passwordForm.value.newPassword)">
+        <div class="fields-grid">
+          <div class="field-group">
+            <label class="field-label">Current Password</label>
+            <input type="password" class="field-input" name="currentPassword" ngModel required>
+          </div>
+          <div class="field-group">
+            <label class="field-label">New Password</label>
+            <input type="password" class="field-input" name="newPassword" ngModel required>
+          </div>
+        </div>
+        <button type="submit" class="btn-secondary-action mt-4">Update Password</button>
+      </form>
+    </div>
+
+    <!-- Divider -->
+    <div class="section-divider"></div>
+
+    <!-- Danger Zone -->
+    <div class="profile-section danger-zone">
+      <h2 class="section-title danger-title">Danger Zone</h2>
+      <p class="danger-desc">Permanently delete your account and all associated data. This cannot be undone.</p>
+      <button class="btn-danger-action" (click)="deleteAccount()">Delete My Account</button>
+    </div>
+
+  </div>
+</div>

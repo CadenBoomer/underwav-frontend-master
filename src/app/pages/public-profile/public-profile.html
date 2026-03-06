@@ -1,0 +1,164 @@
+<div class="public-profile-page" *ngIf="user">
+
+  <!-- Hero -->
+  <div class="profile-hero">
+    <div class="avatar-wrap">
+      <img [src]="user.avatar || '/UnderwavLogo1.png'" class="avatar-img" alt="avatar">
+    </div>
+    <div class="hero-info">
+      <h1 class="hero-name">{{ user.username }}</h1>
+      <p class="hero-location" *ngIf="user.city || user.country">
+        ◎ {{ user.city }} {{ user.country }}
+      </p>
+      <p class="hero-bio">{{ user.bio || 'No bio yet.' }}</p>
+
+      <!-- Stats -->
+      <div class="hero-stats">
+        <div class="stat-item" (click)="setTab('tracks')">
+          <span class="stat-value">{{ tracks.length }}</span>
+          <span class="stat-label">Tracks</span>
+        </div>
+        <div class="stat-item" (click)="setTab('followers')">
+          <span class="stat-value">{{ followers.length }}</span>
+          <span class="stat-label">Followers</span>
+        </div>
+        <div class="stat-item" (click)="setTab('following')">
+          <span class="stat-value">{{ following.length }}</span>
+          <span class="stat-label">Following</span>
+        </div>
+      </div>
+
+      <!-- Follow Button -->
+      <button *ngIf="isLoggedIn" class="follow-btn" [class.follow-btn-active]="isFollowing" (click)="toggleFollow()">
+        {{ isFollowing ? 'Following' : 'Follow' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="profile-tabs">
+    <button class="tab-btn" [class.tab-active]="activeTab === 'tracks'" (click)="setTab('tracks')">Tracks</button>
+    <button class="tab-btn" [class.tab-active]="activeTab === 'liked'" (click)="setTab('liked')">Liked</button>
+    <button class="tab-btn" [class.tab-active]="activeTab === 'followers'"
+      (click)="setTab('followers')">Followers</button>
+    <button class="tab-btn" [class.tab-active]="activeTab === 'following'"
+      (click)="setTab('following')">Following</button>
+  </div>
+
+  <!-- Tracks Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'tracks'">
+    <div class="tracks-grid">
+      <div *ngFor="let track of tracks; let i = index" class="track-wrap">
+
+        <!-- Track Row -->
+        <div class="track-row">
+          <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover"
+            (click)="player.setQueue(tracks, i)">
+          <div class="track-meta" (click)="player.setQueue(tracks, i)">
+            <div class="track-name">{{ track.title }}</div>
+            <div class="track-artist">{{ user.username }}</div>
+          </div>
+          <div class="track-stats">
+            <span>👁 {{ track.views || 0 }}</span>
+            <span>💬 {{ track.comment_count || 0 }}</span>
+          </div>
+          <button class="like-btn" [class.like-btn-active]="track.isLiked" (click)="toggleLike(track)"
+            *ngIf="isLoggedIn">
+            {{ track.isLiked ? '❤️' : '🤍' }} {{ track.likes_count || 0 }}
+          </button>
+          <span *ngIf="!isLoggedIn" class="like-count">🤍 {{ track.likes_count || 0 }}</span>
+          <button class="comment-toggle-btn" (click)="toggleComments(track)">
+            💬 {{ track.showComments ? 'Hide' : 'Comments' }}
+          </button>
+          <button class="track-play-btn" (click)="player.setQueue(tracks, i)">▶</button>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="comments-section" *ngIf="track.showComments">
+
+          <!-- Comment Input -->
+          <div class="comment-input-row" *ngIf="isLoggedIn">
+            <input class="comment-input" type="text" placeholder="Add a comment..." [(ngModel)]="track.newComment"
+              (keydown.enter)="submitComment(track)">
+            <button class="comment-submit-btn" (click)="submitComment(track)">Post</button>
+          </div>
+
+          <!-- Comments List -->
+          <div class="comments-list">
+            <div *ngFor="let comment of track.comments" class="comment-row">
+              <div class="comment-body">
+                <span class="comment-username">{{ comment.username }}</span>
+                <span class="comment-text">{{ comment.content }}</span>
+                <span class="comment-time">{{ comment.created_at | date:'short' }}</span>
+              </div>
+              <div class="comment-actions">
+                <button class="comment-like-btn" [class.comment-like-active]="comment.isLiked"
+                  (click)="toggleCommentLike(comment)">
+                  {{ comment.isLiked ? '❤️' : '🤍' }} {{ comment.likes_count || 0 }}
+                </button>
+                <button class="comment-delete-btn" *ngIf="comment.canDelete"
+                  (click)="deleteComment(track, comment)">✕</button>
+              </div>
+            </div>
+            <div *ngIf="track.comments?.length === 0" class="empty-section">
+              No comments yet. Be the first!
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div *ngIf="tracks.length === 0" class="empty-section">
+        No public tracks yet.
+      </div>
+    </div>
+  </div>
+
+  <!-- Liked Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'liked'">
+    <div class="tracks-grid">
+      <div *ngFor="let track of likedTracks; let i = index" class="track-row" (click)="player.setQueue(likedTracks, i)">
+        <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
+        <div class="track-meta">
+          <div class="track-name">{{ track.title }}</div>
+        </div>
+        <button class="track-play-btn">▶</button>
+      </div>
+      <div *ngIf="likedTracks.length === 0" class="empty-section">
+        No liked tracks yet.
+      </div>
+    </div>
+  </div>
+
+  <!-- Followers Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'followers'">
+    <div class="users-grid">
+      <div *ngFor="let follower of followers" class="user-row">
+        <img [src]="follower.avatar || '/UnderwavLogo1.png'" class="user-thumb" alt="avatar">
+        <div class="user-name">{{ follower.username }}</div>
+      </div>
+      <div *ngIf="followers.length === 0" class="empty-section">
+        No followers yet.
+      </div>
+    </div>
+  </div>
+
+  <!-- Following Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'following'">
+    <div class="users-grid">
+      <div *ngFor="let follow of following" class="user-row">
+        <img [src]="follow.avatar || '/UnderwavLogo1.png'" class="user-thumb" alt="avatar">
+        <div class="user-name">{{ follow.username }}</div>
+      </div>
+      <div *ngIf="following.length === 0" class="empty-section">
+        Not following anyone yet.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Loading state -->
+<div *ngIf="!user" class="loading-state">
+  Loading profile...
+</div>

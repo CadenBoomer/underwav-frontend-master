@@ -1,0 +1,104 @@
+<div class="upload-page">
+
+  <div class="upload-container">
+
+    <!-- Header -->
+    <div class="upload-header mb-5">
+      <h1 class="upload-title">Upload</h1>
+      <p class="upload-subtitle">Share your sound with the world</p>
+    </div>
+
+    <div class="upload-layout">
+
+      <!-- Left: Cover Preview -->
+      <div class="cover-section">
+        <div class="cover-drop" (click)="coverInput.click()">
+          <img *ngIf="coverPreview" [src]="coverPreview" class="cover-preview" alt="Cover">
+          <div *ngIf="!coverPreview" class="cover-placeholder">
+            <span class="cover-icon">⊕</span>
+            <span class="cover-hint">Cover Art</span>
+          </div>
+        </div>
+        <input #coverInput id="coverInput" type="file"
+               (change)="onCoverChange($event)" accept="image/*" hidden />
+
+        <!-- Audio Drop Zone -->
+        <div class="audio-drop" (click)="fileInput.click()"
+             [class.audio-selected]="selectedFile">
+          <span *ngIf="!selectedFile">♪ Select Audio File</span>
+          <span *ngIf="selectedFile" class="audio-name">♪ {{ selectedFile.name }}</span>
+        </div>
+        <input #fileInput id="fileInput" type="file"
+               (change)="onFileChange($event)" accept="audio/*" hidden />
+      </div>
+
+      <!-- Right: Form Fields -->
+      <div class="form-section">
+
+        <!-- Title -->
+        <div class="field-group">
+          <label class="field-label">Title</label>
+          <input type="text" [(ngModel)]="title"
+                 class="field-input" placeholder="Track name..." />
+        </div>
+
+        <!-- Description -->
+        <div class="field-group">
+          <label class="field-label">Description</label>
+          <textarea [(ngModel)]="description"
+                    class="field-input field-textarea"
+                    placeholder="What's this track about..."></textarea>
+        </div>
+
+        <!-- Lyrics -->
+        <div class="field-group">
+          <label class="field-label">Lyrics</label>
+          <textarea [(ngModel)]="lyrics"
+                    class="field-input field-textarea field-lyrics"
+                    placeholder="Paste your lyrics here..."></textarea>
+        </div>
+
+        <!-- Genres -->
+        <div class="field-group">
+          <label class="field-label">Genres</label>
+          <div class="genre-bubbles mb-2">
+            <span *ngFor="let genre of selectedGenres; let i = index" class="genre-bubble">
+              {{ genre.name }}
+              <button type="button" class="remove-btn" (click)="removeGenre(i)">×</button>
+            </span>
+          </div>
+          <select class="field-input field-select"
+                  [(ngModel)]="currentGenre"
+                  (change)="addGenre()" #genreSelect>
+            <option [ngValue]="null" disabled selected>Add a genre...</option>
+            <option *ngFor="let genre of genres" [ngValue]="genre">{{ genre.name }}</option>
+          </select>
+        </div>
+
+        <!-- Privacy + Submit Row -->
+        <div class="bottom-row">
+
+          <div class="privacy-toggle">
+            <span class="field-label">Visibility</span>
+            <div class="toggle-wrap">
+              <button class="toggle-btn"
+                      [class.toggle-active]="isPublic"
+                      (click)="isPublic = true">Public</button>
+              <button class="toggle-btn"
+                      [class.toggle-active]="!isPublic"
+                      (click)="isPublic = false">Private</button>
+            </div>
+          </div>
+
+          <button class="upload-btn"
+                  (click)="uploadSong(fileInput, coverInput, genreSelect)"
+                  [disabled]="!selectedFile">
+            {{ uploading ? 'Uploading...' : 'Upload Track' }}
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,92 @@
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark custom-navbar px-3 shadow-sm">
+  <div class="container-fluid d-flex align-items-center">
+
+    <!-- Left Section (Brand + Nav) -->
+    <div class="d-flex align-items-center gap-4">
+      <a class="navbar-brand d-flex align-items-center gap-2 mb-0" routerLink="/" routerLinkActive="active">
+        <img src="/UnderwavLogo1.png" alt="Underwav logo" height="100" width="60">
+        <span>Underwav</span>
+      </a>
+
+      <ul class="navbar-nav nav-underline flex-row gap-3">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/discover" routerLinkActive="active">Discover</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Center Section -->
+    <div class="flex-grow-1 px-4 d-flex justify-content-center">
+      <div style="width: 700px; position: relative;">
+        <input class="form-control search-input" type="search" placeholder="Search tracks or artists"
+          [(ngModel)]="searchQuery" (input)="onSearch()" (focus)="showResults = true" (blur)="hideResults()">
+
+        <!-- Results Dropdown -->
+        <div class="search-dropdown" *ngIf="showResults && (searchTracks.length > 0 || searchArtists.length > 0)">
+
+          <!-- Tracks -->
+          <div *ngIf="searchTracks.length > 0">
+            <div class="search-section-label">Tracks</div>
+            <div *ngFor="let track of searchTracks; let i = index" class="search-result-row"
+              (mousedown)="playTrack(track, i)">
+              <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="search-thumb" alt="cover">
+              <div class="search-meta">
+                <div class="search-name">{{ track.title }}</div>
+                <div class="search-sub">{{ track.artist || 'Unknown Artist' }}</div>
+              </div>
+              <span class="search-type-badge">Track</span>
+            </div>
+          </div>
+
+          <!-- Artists -->
+          <div *ngIf="searchArtists.length > 0">
+            <div class="search-section-label">Artists</div>
+            <div *ngFor="let artist of searchArtists" class="search-result-row" (mousedown)="goToProfile(artist.id)">
+              <img [src]="artist.avatar || '/UnderwavLogo1.png'" class="search-thumb search-thumb-round" alt="avatar">
+              <div class="search-meta">
+                <div class="search-name">{{ artist.username }}</div>
+                <div class="search-sub">{{ artist.track_count || 0 }} tracks</div>
+              </div>
+              <span class="search-type-badge">Artist</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Section -->
+    <div class="d-flex">
+      <ul class="navbar-nav nav-underline flex-row gap-3 me-3">
+
+        <!-- Not Logged In -->
+        <ng-container *ngIf="!isLoggedIn">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login" routerLinkActive="active">Sign In</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/signup" routerLinkActive="active">Create Account</a>
+          </li>
+        </ng-container>
+
+        <!-- Logged In -->
+        <ng-container *ngIf="isLoggedIn">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/dashboard" routerLinkActive="active"
+              (click)="linkClicked('/dashboard')">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/upload" routerLinkActive="active"
+              (click)="linkClicked('/upload')">Upload</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/profile" routerLinkActive="active"
+              (click)="linkClicked('/profile')">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="logout(); linkClicked('logout')" style="cursor:pointer">Logout</a>
+          </li>
+        </ng-container>

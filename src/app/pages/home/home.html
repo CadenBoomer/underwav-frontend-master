@@ -1,0 +1,82 @@
+<div class="home-page">
+
+  <!-- Continue Listening -->
+  <section class="home-section" *ngIf="player.currentTrack()">
+    <div class="section-header">
+      <h2 class="section-title">▶ Continue Listening</h2>
+      <p class="section-sub">Pick up where you left off</p>
+    </div>
+    <div class="continue-card" (click)="player.setQueue([player.currentTrack()!], 0)">
+      <img [src]="player.currentTrack()!.coverUrl || '/UnderwavLogo1.png'" class="continue-cover" alt="cover">
+      <div class="continue-info">
+        <div class="continue-title">{{ player.currentTrack()!.title }}</div>
+        <div class="continue-artist">{{ player.currentTrack()!.artist || 'Unknown Artist' }}</div>
+      </div>
+      <button class="continue-play-btn">▶</button>
+    </div>
+  </section>
+
+  <!-- Recently Uploaded by People You Follow -->
+  <section class="home-section">
+    <div class="section-header">
+      <h2 class="section-title">👥 From People You Follow</h2>
+      <p class="section-sub">Latest from your network</p>
+    </div>
+    <div class="tracks-grid">
+      <div *ngFor="let track of followedTracks; let i = index" class="track-row"
+        (click)="player.setQueue(followedTracks, i)">
+        <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
+        <div class="track-meta">
+          <div class="track-name">{{ track.title }}</div>
+          <div class="track-artist">{{ track.artist || 'Unknown Artist' }}</div>
+        </div>
+        <button class="track-play-btn">▶</button>
+      </div>
+      <div *ngIf="followedTracks.length === 0" class="empty-section">
+        Follow some artists to see their latest uploads here.
+      </div>
+    </div>
+  </section>
+
+  <!-- Your Genre Mix -->
+  <section class="home-section">
+    <div class="section-header">
+      <h2 class="section-title">🎵 Your Genre Mix</h2>
+      <p class="section-sub">Tracks matching your taste</p>
+    </div>
+    <div class="tracks-grid">
+      <div *ngFor="let track of genreMix; let i = index" class="track-row" (click)="player.setQueue(genreMix, i)">
+        <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
+        <div class="track-meta">
+          <div class="track-name">{{ track.title }}</div>
+          <div class="track-artist">{{ track.artist || 'Unknown Artist' }}</div>
+        </div>
+        <button class="track-play-btn">▶</button>
+      </div>
+      <div *ngIf="genreMix.length === 0" class="empty-section">
+        Upload some tracks with genres to get personalized recommendations.
+      </div>
+    </div>
+  </section>
+
+<!-- Suggested Artists -->
+<section class="home-section">
+  <div class="section-header">
+    <h2 class="section-title">🎤 Suggested Artists</h2>
+    <p class="section-sub">Creators you might like</p>
+  </div>
+  <div class="artists-grid">
+    <div *ngFor="let artist of suggestedArtists" 
+         class="artist-card"
+         [routerLink]="['/profile', artist.id]">
+      <img [src]="artist.avatar || '/UnderwavLogo1.png'" class="artist-avatar" alt="avatar">
+      <div class="artist-name">{{ artist.username }}</div>
+      <div class="artist-tracks">{{ artist.track_count || 0 }} tracks</div>
+    </div>
+    <div *ngIf="suggestedArtists.length === 0" class="empty-section">
+      No suggestions yet.
+    </div>
+  </div>
+</section>
+
+</div>

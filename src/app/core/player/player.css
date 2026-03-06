@@ -1,0 +1,90 @@
+.player {
+  background: #121212;
+  border-top: 1px solid #2a2a2a;
+  height: 72px;
+  z-index: 1050;
+}
+
+.player-cover {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+}
+
+.track-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  max-width: 180px;
+}
+
+.track-artist {
+  font-size: 0.75rem;
+  color: #aaa;
+  max-width: 180px;
+}
+
+.ctrl-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.1rem;
+  padding: 4px 6px;
+  cursor: pointer;
+  transition: color 0.15s;
+  line-height: 1;
+}
+
+.ctrl-btn:hover { color: #fff; }
+.ctrl-btn.active { color: #1db954; }
+
+.play-btn {
+  background: #fff;
+  color: #000 !important;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: transform 0.1s, background 0.15s;
+}
+
+.play-btn:hover {
+  background: #ddd;
+  transform: scale(1.05);
+}
+
+.time-label {
+  font-size: 0.7rem;
+  color: #aaa;
+  min-width: 32px;
+  text-align: center;
+}
+
+/* Progress & Volume range styling */
+.progress-bar, .volume-bar {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: #3a3a3a;
+  outline: none;
+  cursor: pointer;
+}
+
+.progress-bar::-webkit-slider-thumb,
+.volume-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+}
+
+.progress-bar:hover::-webkit-slider-thumb,
+.volume-bar:hover::-webkit-slider-thumb {
+  background: #1db954;
+}

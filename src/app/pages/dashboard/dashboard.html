@@ -1,0 +1,215 @@
+<!-- Section Header -->
+<div class="uploads-header d-flex align-items-baseline gap-3 mb-4">
+  <h2 class="section-title">My Uploads</h2>
+  <span class="track-count">{{ totalTracks }} {{ totalTracks === 1 ? 'track' : 'tracks' }} total</span>
+  <!-- <span class="track-count">{{ uploads.length === 1 ? 'There is 1 track' : 'There are ' + uploads.length + ' tracks' }}
+    on this page</span> -->
+</div>
+
+<!-- Empty State -->
+<div *ngIf="uploads.length === 0" class="empty-state text-center py-5">
+  <div class="empty-icon">♪</div>
+  <p>No uploads yet. Drop your first track.</p>
+</div>
+
+<!-- Manual Carousel -->
+<div *ngIf="uploads.length > 0" class="uploads-carousel">
+
+  <div class="track-card d-flex gap-4 align-items-start">
+
+    <!-- Cover Art -->
+    <div class="cover-wrap" (click)="player.setQueue(uploads, activeIndex)">
+      <img [src]="currentTrack.coverUrl || '/UnderwavLogo1.png'" class="cover-art" alt="{{ currentTrack.title }}">
+      <div class="cover-overlay">
+        <span class="play-icon">▶</span>
+      </div>
+    </div>
+
+    <!-- Track Info -->
+    <div class="track-details flex-grow-1">
+      <div class="track-number mb-1">
+        #{{ activeIndex + 1 }} / {{ uploads.length }}
+        <span class="privacy-badge" [class.badge-public]="currentTrack.is_public"
+          [class.badge-private]="!currentTrack.is_public">
+          {{ currentTrack.is_public ? 'Public' : 'Private' }}
+        </span>
+      </div>
+
+      <!-- Genre tags -->
+      <div class="genre-tags mb-2" *ngIf="currentTrack.genres && currentTrack.genres.length > 0">
+        <span *ngFor="let genre of currentTrack.genres" class="genre-tag">{{ genre.name }}</span>
+      </div>
+
+      <h3 class="track-name">{{ currentTrack.title }}</h3>
+      <p class="track-desc">{{ currentTrack.description || 'No description.' }}</p>
+
+      <!-- Stats Row -->
+      <div class="stats-row d-flex gap-4 my-3">
+        <div class="stat">
+          <span class="stat-value">{{ currentTrack.views || 0 }}</span>
+          <span class="stat-label">Views</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ currentTrack.likes_count || 0 }}</span>
+          <span class="stat-label">Likes</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ currentTrack.comment_count || 0 }}</span>
+          <span class="stat-label">Comments</span>
+        </div>
+      </div>
+
+      <!-- Lyrics Preview -->
+      <div *ngIf="currentTrack.lyrics" class="lyrics-preview">
+        <span class="lyrics-label">Lyrics</span>
+        <p class="lyrics-text">
+          {{ currentTrack.lyrics | slice:0:120 }}{{ currentTrack.lyrics!.length > 120 ? '…' : '' }}
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <div class="d-flex gap-2 mt-4">
+        <button class="btn-play-track" (click)="player.setQueue(uploads, activeIndex)">▶ Play</button>
+        <button class="btn-edit-track" (click)="openEdit(currentTrack)">✎ Edit</button>
+        <button class="comment-toggle-btn" (click)="toggleComments()">
+          💬 {{ showComments ? 'Hide Comments' : 'Comments' }}
+        </button>
+      </div>
+
+      <!-- Comments Section -->
+      <div class="comments-section" *ngIf="showComments">
+        <div class="comment-input-row">
+          <input class="comment-input" type="text" placeholder="Add a comment..." [(ngModel)]="newComment"
+            (keydown.enter)="submitComment()">
+          <button class="comment-submit-btn" (click)="submitComment()">Post</button>
+        </div>
+        <div class="comments-list">
+          <div *ngFor="let comment of comments" class="comment-row">
+            <div class="comment-body">
+              <span class="comment-username">{{ comment.username }}</span>
+              <span class="comment-text">{{ comment.content }}</span>
+              <span class="comment-time">{{ comment.created_at | date:'short' }}</span>
+            </div>
+            <div class="comment-actions">
+              <button class="comment-delete-btn" (click)="deleteComment(comment)">✕</button>
+            </div>
+          </div>
+          <div *ngIf="comments.length === 0" class="empty-section">
+            No comments yet.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- Controls -->
+<div class="carousel-controls d-flex align-items-center gap-3 mt-4">
+  <button class="carousel-ctrl" (click)="prev()">← Prev</button>
+
+  <div class="dots d-flex gap-2" *ngIf="uploads.length <= 10">
+    <button *ngFor="let track of uploads; let i = index" class="dot" [class.dot-active]="i === activeIndex"
+      (click)="goToSlide(i)">
+    </button>
+  </div>
+
+  <span class="track-counter" *ngIf="uploads.length > 10">
+    {{ activeIndex + 1 }} / {{ uploads.length }}
+  </span>
+
+  <button class="carousel-ctrl" (click)="next()">Next →</button>
+</div>
+
+<!-- Page Controls -->
+<div class="d-flex align-items-center justify-content-center gap-3 mt-3" *ngIf="totalPages > 1">
+  <button class="carousel-ctrl" (click)="prevPage()" [disabled]="currentPage === 1">
+    « Previous Page
+  </button>
+  <span class="track-counter">Page {{ currentPage }} / {{ totalPages }}</span>
+  <button class="carousel-ctrl" (click)="nextPage()" [disabled]="currentPage === totalPages">
+    Next Page »
+  </button>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-backdrop" *ngIf="editOpen" (click)="closeEdit()"></div>
+<div class="edit-modal" *ngIf="editOpen">
+
+  <div class="edit-modal-header">
+    <h3 class="edit-modal-title">Edit Track</h3>
+    <button class="edit-close-btn" (click)="closeEdit()">✕</button>
+  </div>
+
+  <div class="edit-modal-body">
+
+    <!-- Cover Image -->
+    <div class="edit-cover-row">
+      <div class="edit-cover-wrap" (click)="editCoverInput.click()">
+        <img [src]="editCoverPreview || currentTrack.coverUrl || '/UnderwavLogo1.png'" class="edit-cover-img"
+          alt="cover">
+        <div class="edit-cover-overlay">Change Cover</div>
+      </div>
+      <input #editCoverInput type="file" accept="image/*" (change)="onEditCoverChange($event)" hidden />
+    </div>
+
+    <!-- Title -->
+    <div class="field-group">
+      <label class="field-label">Title</label>
+      <input type="text" class="field-input" [(ngModel)]="editForm.title">
+    </div>
+
+    <!-- Description -->
+    <div class="field-group">
+      <label class="field-label">Description</label>
+      <textarea class="field-input field-textarea" [(ngModel)]="editForm.description"></textarea>
+    </div>
+
+    <!-- Lyrics -->
+    <div class="field-group">
+      <label class="field-label">Lyrics</label>
+      <textarea class="field-input field-textarea field-lyrics" [(ngModel)]="editForm.lyrics"></textarea>
+    </div>
+
+    <!-- Genres -->
+    <div class="field-group">
+      <label class="field-label">Genres</label>
+      <div class="genre-bubbles mb-2">
+        <span *ngFor="let genre of editSelectedGenres; let i = index" class="genre-bubble">
+          {{ genre.name }}
+          <button type="button" class="remove-btn" (click)="removeEditGenre(i)">×</button>
+        </span>
+      </div>
+      <select class="field-input field-select" [(ngModel)]="editCurrentGenre" (change)="addEditGenre()">
+        <option [ngValue]="null" disabled selected>Add a genre...</option>
+        <option *ngFor="let genre of allGenres" [ngValue]="genre">{{ genre.name }}</option>
+      </select>
+    </div>
+
+    <!-- Visibility -->
+    <div class="field-group">
+      <label class="field-label">Visibility</label>
+      <div class="toggle-wrap mt-1">
+        <button class="toggle-btn" [class.toggle-active]="editForm.is_public === 1"
+          (click)="editForm.is_public = 1">Public</button>
+        <button class="toggle-btn" [class.toggle-active]="editForm.is_public === 0"
+          (click)="editForm.is_public = 0">Private</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer with delete on left, cancel/save on right -->
+  <div class="edit-modal-footer">
+    <button class="btn-danger-sm" (click)="deleteTrack()">🗑 Delete</button>
+    <div class="d-flex gap-2 ms-auto">
+      <button class="btn-cancel" (click)="closeEdit()">Cancel</button>
+      <button class="btn-save" (click)="saveEdit()" [disabled]="saving">
+        {{ saving ? 'Saving...' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+
+</div>

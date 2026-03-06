@@ -1,0 +1,156 @@
+
+<div class="discover-page">
+
+  <!-- Hero Banner -->
+  <div class="hero-section" *ngIf="!isLoggedIn">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Underwav</div>
+      <h1 class="hero-title">Discover your next<br>favourite sound</h1>
+      <p class="hero-sub">Explore trending tracks, rising artists, and fresh uploads — all in one place.</p>
+      <div class="hero-actions">
+        <a routerLink="/signup" class="btn-hero-primary">Get Started Free</a>
+        <a routerLink="/login" class="btn-hero-secondary">Sign In</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <img src="/UnderwavLogo1.png" alt="Underwav" class="hero-logo">
+    </div>
+  </div>
+
+  <!-- Trending This Week -->
+  <section class="discover-section">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">🔥 Trending This Week</h2>
+        <p class="section-sub">What everyone's listening to right now</p>
+      </div>
+    </div>
+    <div class="tracks-grid">
+      <div *ngFor="let track of trendingTracks; let i = index"
+           class="track-row"
+           (click)="player.setQueue(trendingTracks, i)">
+        <span class="track-rank">{{ i + 1 }}</span>
+        <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
+        <div class="track-meta">
+          <div class="track-name">{{ track.title }}</div>
+          <div class="track-artist">{{ track.artist || 'Unknown Artist' }}</div>
+        </div>
+        <div class="track-stats">
+          <span>👁 {{ track.views || 0 }}</span>
+          <span>❤️ {{ track.likes_count || 0 }}</span>
+          <span>💬 {{ track.comment_count || 0 }}</span>
+        </div>
+        <button class="track-play-btn">▶</button>
+      </div>
+      <div *ngIf="trendingTracks.length === 0" class="empty-section">
+        No trending tracks this week yet.
+      </div>
+    </div>
+  </section>
+
+  <!-- Most Viewed -->
+  <section class="discover-section">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">🌍 Most Viewed</h2>
+        <p class="section-sub">All time most played tracks</p>
+      </div>
+    </div>
+    <div class="tracks-grid">
+      <div *ngFor="let track of mostViewed; let i = index"
+           class="track-row"
+           (click)="player.setQueue(mostViewed, i)">
+        <span class="track-rank">{{ i + 1 }}</span>
+        <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
+        <div class="track-meta">
+          <div class="track-name">{{ track.title }}</div>
+          <div class="track-artist">{{ track.artist || 'Unknown Artist' }}</div>
+        </div>
+        <div class="track-stats">
+          <span>👁 {{ track.views || 0 }}</span>
+          <span>❤️ {{ track.likes_count || 0 }}</span>
+          <span>💬 {{ track.comment_count || 0 }}</span>
+        </div>
+        <button class="track-play-btn">▶</button>
+      </div>
+      <div *ngIf="mostViewed.length === 0" class="empty-section">
+        No tracks yet.
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Uploads -->
+  <section class="discover-section">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">🆕 Recent Uploads</h2>
+        <p class="section-sub">Fresh tracks just dropped</p>
+      </div>
+    </div>
+    <div class="tracks-grid">
+      <div *ngFor="let track of recentTracks; let i = index"
+           class="track-row"
+           (click)="player.setQueue(recentTracks, i)">
+        <span class="track-rank">{{ i + 1 }}</span>
+        <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
+        <div class="track-meta">
+          <div class="track-name">{{ track.title }}</div>
+          <div class="track-artist">{{ track.artist || 'Unknown Artist' }}</div>
+        </div>
+        <div class="track-stats">
+          <span>👁 {{ track.views || 0 }}</span>
+          <span>❤️ {{ track.likes_count || 0 }}</span>
+          <span>💬 {{ track.comment_count || 0 }}</span>
+        </div>
+        <button class="track-play-btn">▶</button>
+      </div>
+      <div *ngIf="recentTracks.length === 0" class="empty-section">
+        No recent uploads yet.
+      </div>
+    </div>
+  </section>
+
+  <!-- Browse by Genre -->
+  <section class="discover-section">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">🎵 Browse by Genre</h2>
+        <p class="section-sub">Find your sound</p>
+      </div>
+    </div>
+    <div class="genre-grid">
+      <div *ngFor="let genre of genres"
+           class="genre-pill"
+           (click)="selectGenre(genre)"
+           [class.genre-active]="selectedGenre?.id === genre.id">
+        {{ genre.name }}
+      </div>
+    </div>
+
+    <!-- Genre Tracks -->
+    <div *ngIf="selectedGenre" class="tracks-grid mt-4">
+      <div class="genre-tracks-header mb-3">
+        <span class="section-sub">Showing tracks in <strong style="color: #c8f04c">{{ selectedGenre.name }}</strong></span>
+      </div>
+      <div *ngFor="let track of genreTracks; let i = index"
+           class="track-row"
+           (click)="player.setQueue(genreTracks, i)">
+        <span class="track-rank">{{ i + 1 }}</span>
+        <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
+        <div class="track-meta">
+          <div class="track-name">{{ track.title }}</div>
+          <div class="track-artist">{{ track.artist || 'Unknown Artist' }}</div>
+        </div>
+        <div class="track-stats">
+          <span>👁 {{ track.views || 0 }}</span>
+          <span>❤️ {{ track.likes_count || 0 }}</span>
+        </div>
+        <button class="track-play-btn">▶</button>
+      </div>
+      <div *ngIf="genreTracks.length === 0" class="empty-section">
+        No tracks in this genre yet.
+      </div>
+    </div>
+  </section>
+
+</div>
