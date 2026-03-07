@@ -702,3 +702,46 @@
 .comment-like-active { color: #ff6b6b !important; }
 
 .comment-delete-btn:hover { color: #ff6b6b; }
+
+.lyrics-text {
+  font-size: 0.8rem;
+  color: #aaa;
+  font-style: italic;
+  margin: 0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.lyrics-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+
+.lyrics-toggle {
+  font-size: 0.7rem;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+
+.lyrics-header:hover .lyrics-toggle {
+  color: var(--accent);
+}
+
+.lyrics-text {
+  font-size: 0.8rem;
+  color: #aaa;
+  font-style: italic;
+  margin: 0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  max-height: 1000px;
+}
+
+.lyrics-collapsed {
+  max-height: 0;
+}

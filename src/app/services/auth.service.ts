@@ -62,7 +62,7 @@ export class AuthService {
   }
 
   // Profile CRUD
-  getProfile() { return this.http.get(`${this.apiUrl}/profile`, this.getAuthHeaders()); }
+  getProfile() {return this.http.get<UserProfile>(`${this.apiUrl}/profile`, this.getAuthHeaders());}
   updateProfile(data: any) { return this.http.patch(`${this.apiUrl}/profile`, data, this.getAuthHeaders()); }
   deleteProfile() { return this.http.delete(`${this.apiUrl}/profile`, this.getAuthHeaders()); }
 

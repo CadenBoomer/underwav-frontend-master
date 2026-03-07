@@ -30,7 +30,7 @@ export class Header implements OnInit {
     private auth: AuthService,
     private http: HttpClient,
     private player: PlayerService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.auth.loggedIn$.subscribe(status => {
@@ -64,7 +64,12 @@ export class Header implements OnInit {
               ? `http://localhost:3000/uploads/images/${t.cover_image}`
               : undefined
           }));
-          this.searchArtists = res.artists;
+          this.searchArtists = res.artists.map((a: any) => ({
+            ...a,
+            avatar: a.avatar
+              ? a.avatar.startsWith('http') ? a.avatar : `http://localhost:3000/uploads/images/${a.avatar}`
+              : null
+          }));
         },
         error: (err) => console.error('Search error:', err)
       });

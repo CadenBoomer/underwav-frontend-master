@@ -33,6 +33,7 @@ export class Dashboard implements OnInit {
   editCurrentGenre: Genre | null = null;
   editSelectedGenres: Genre[] = [];
   allGenres: Genre[] = [];
+  lyricsExpanded = false;
 
   editForm: {
     id: number;
@@ -90,17 +91,21 @@ export class Dashboard implements OnInit {
     this.activeIndex = index;
     this.showComments = false;
     this.comments = [];
+    this.lyricsExpanded = false;
   }
 
   prev() {
     this.activeIndex = this.activeIndex > 0 ? this.activeIndex - 1 : this.uploads.length - 1;
     this.showComments = false;
     this.comments = [];
+    this.lyricsExpanded = false;
   }
+
   next() {
     this.activeIndex = this.activeIndex < this.uploads.length - 1 ? this.activeIndex + 1 : 0;
     this.showComments = false;
     this.comments = [];
+    this.lyricsExpanded = false;
   }
   nextPage() { if (this.currentPage < this.totalPages) this.loadUploads(this.currentPage + 1); }
   prevPage() { if (this.currentPage > 1) this.loadUploads(this.currentPage - 1); }
@@ -213,7 +218,24 @@ export class Dashboard implements OnInit {
       `http://localhost:3000/api/comments/${this.currentTrack.id}`
     ).subscribe({
       next: (res) => {
-        this.comments = res.comments;
+        const comments = res.comments.map((c: any) => ({ ...c, isLiked: false }));
+        this.comments = comments;
+
+        if (comments.length > 0) {
+          const commentIds = comments.map((c: any) => c.id);
+          this.http.post(
+            'http://localhost:3000/api/comments/like-status',
+            { commentIds },
+            this.auth.getAuthHeaders()
+          ).subscribe({
+            next: (statusRes: any) => {
+              const likedIds = new Set(statusRes.likedIds);
+              this.comments = this.comments.map(c => ({ ...c, isLiked: likedIds.has(c.id) }));
+              this.cdr.markForCheck();
+            },
+            error: () => { }
+          });
+        }
         this.cdr.markForCheck();
       },
       error: (err) => console.error('Comments error:', err)
@@ -258,7 +280,7 @@ export class Dashboard implements OnInit {
   toggleCommentLike(comment: any) {
     if (comment.isLiked) {
       this.http.delete(
-        `http://localhost:3000/api/comments/${comment.id}/like`,
+        `http://localhost:3000/api/comments/comment/${comment.id}/like`,
         this.auth.getAuthHeaders()
       ).subscribe({
         next: (res: any) => {
@@ -270,7 +292,7 @@ export class Dashboard implements OnInit {
       });
     } else {
       this.http.post(
-        `http://localhost:3000/api/comments/${comment.id}/like`,
+        `http://localhost:3000/api/comments/comment/${comment.id}/like`,
         {},
         this.auth.getAuthHeaders()
       ).subscribe({

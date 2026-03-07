@@ -83,7 +83,17 @@ export class PublicProfile implements OnInit {
   loadAll() {
     this.http.get<PublicUser>(`http://localhost:3000/api/auth/users/${this.profileId}`)
       .subscribe({
-        next: (user) => { this.user = user; this.cdr.markForCheck(); },
+        next: (user) => {
+          this.user = {
+            ...user,
+            avatar: user.avatar
+              ? user.avatar.startsWith('http')
+                ? user.avatar
+                : `http://localhost:3000/uploads/images/${user.avatar}`
+              : null
+          };
+          this.cdr.markForCheck();
+        },
         error: (err) => console.error('Profile error:', err)
       });
 
@@ -121,13 +131,29 @@ export class PublicProfile implements OnInit {
 
     this.http.get<any[]>(`http://localhost:3000/api/follows/followers/${this.profileId}`)
       .subscribe({
-        next: (followers) => { this.followers = followers; this.cdr.markForCheck(); },
+        next: (followers) => {
+          this.followers = followers.map(f => ({
+            ...f,
+            avatar: f.avatar
+              ? f.avatar.startsWith('http') ? f.avatar : `http://localhost:3000/uploads/images/${f.avatar}`
+              : null
+          }));
+          this.cdr.markForCheck();
+        },
         error: (err) => console.error('Followers error:', err)
       });
 
     this.http.get<any[]>(`http://localhost:3000/api/follows/following/${this.profileId}`)
       .subscribe({
-        next: (following) => { this.following = following; this.cdr.markForCheck(); },
+        next: (following) => {
+          this.following = following.map(f => ({
+            ...f,
+            avatar: f.avatar
+              ? f.avatar.startsWith('http') ? f.avatar : `http://localhost:3000/uploads/images/${f.avatar}`
+              : null
+          }));
+          this.cdr.markForCheck();
+        },
         error: (err) => console.error('Following error:', err)
       });
 

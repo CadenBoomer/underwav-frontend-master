@@ -1,81 +1,83 @@
-<div class="player fixed-bottom d-flex align-items-center justify-content-between px-4 py-2 shadow-lg">
+<div class="player-container">
 
-  <!-- Left: Track Info -->
-  <div class="d-flex align-items-center gap-3" style="min-width: 200px;">
-    <img
-      [src]="player.currentTrack()?.coverUrl || '/UnderwavLogo1.png'"
-      class="player-cover rounded"
-      alt="cover">
-    <div class="track-info overflow-hidden">
-      <div class="track-title text-truncate">
-        {{ player.currentTrack()?.title || 'No track selected' }}
+  <!-- Expand Panel -->
+  <div class="player-expand" [class.player-expand-open]="expanded()" *ngIf="player.currentTrack()">
+    <div class="expand-inner">
+      <button class="expand-close" (click)="toggleExpand()">✕</button>
+      <div class="expand-layout">
+        <img [src]="player.currentTrack()!.coverUrl || '/UnderwavLogo1.png'" class="expand-cover" alt="cover">
+        <div class="expand-info">
+          <h2 class="expand-title">{{ player.currentTrack()!.title }}</h2>
+          <div class="expand-artist" [routerLink]="['/profile', player.currentTrack()!.user_id]" (click)="expanded.set(false)">
+            {{ player.currentTrack()!.artist || 'Unknown Artist' }}
+          </div>
+          <div class="expand-genres" *ngIf="player.currentTrack()!.genres?.length">
+            <span *ngFor="let genre of player.currentTrack()!.genres" class="expand-genre-tag">{{ genre.name }}</span>
+          </div>
+          <div class="expand-section" *ngIf="player.currentTrack()!.description">
+            <div class="expand-label">Description</div>
+            <p class="expand-text">{{ player.currentTrack()!.description }}</p>
+          </div>
+          <div class="expand-section" *ngIf="player.currentTrack()!.lyrics">
+            <div class="expand-label">Lyrics</div>
+            <p class="expand-text expand-lyrics">{{ player.currentTrack()!.lyrics }}</p>
+          </div>
+          <div class="expand-empty" *ngIf="!player.currentTrack()!.description && !player.currentTrack()!.lyrics">
+            No additional details available.
+          </div>
+        </div>
       </div>
-      <div class="track-artist text-truncate">
-        {{ player.currentTrack()?.artist || '' }}
+    </div>
+  </div>
+
+  <!-- Player Bar -->
+  <div class="player d-flex align-items-center justify-content-between px-4 py-2 shadow-lg">
+
+    <!-- Left: Track Info -->
+    <div class="d-flex align-items-center gap-3 player-track-info" style="min-width: 200px;" (click)="toggleExpand()">
+      <img [src]="player.currentTrack()?.coverUrl || '/UnderwavLogo1.png'" class="player-cover rounded" alt="cover">
+      <div class="track-info overflow-hidden">
+        <div class="track-title text-truncate">{{ player.currentTrack()?.title || 'No track selected' }}</div>
+        <div class="track-artist text-truncate">{{ player.currentTrack()?.artist || '' }}</div>
+      </div>
+      <span class="expand-hint" *ngIf="player.currentTrack()">{{ expanded() ? '▼' : '▲' }}</span>
+    </div>
+
+    <!-- Center: Controls + Progress -->
+    <div class="d-flex flex-column align-items-center flex-grow-1 px-4" style="max-width: 600px;">
+      <div class="d-flex align-items-center gap-3 mb-1">
+        <button class="ctrl-btn" (click)="player.toggleShuffle()" [class.active]="player.isShuffled()">
+          <i class="bi bi-shuffle"></i>
+        </button>
+        <button class="ctrl-btn" (click)="player.skipPrev()">
+          <i class="bi bi-skip-backward-fill"></i>
+        </button>
+        <button class="ctrl-btn play-btn" (click)="player.togglePlay()">
+          <i class="bi" [class.bi-play-fill]="!player.isPlaying()" [class.bi-pause-fill]="player.isPlaying()"></i>
+        </button>
+        <button class="ctrl-btn" (click)="player.skipNext()">
+          <i class="bi bi-skip-forward-fill"></i>
+        </button>
+        <button class="ctrl-btn" (click)="player.toggleRepeat()" [class.active]="player.repeatMode() !== 'none'">
+          <i class="bi" [class.bi-repeat]="player.repeatMode() !== 'one'" [class.bi-repeat-1]="player.repeatMode() === 'one'"></i>
+        </button>
+      </div>
+      <div class="d-flex align-items-center gap-2 w-100">
+        <span class="time-label">{{ player.formatTime(player.currentTime()) }}</span>
+        <input type="range" class="progress-bar flex-grow-1" [min]="0" [max]="player.duration() || 0"
+          [value]="player.currentTime()" (input)="onSeek($event)" step="0.1">
+        <span class="time-label">{{ player.formatTime(player.duration()) }}</span>
       </div>
     </div>
-  </div>
 
-  <!-- Center: Controls + Progress -->
-  <div class="d-flex flex-column align-items-center flex-grow-1 px-4" style="max-width: 600px;">
-
-    <!-- Buttons -->
-    <div class="d-flex align-items-center gap-3 mb-1">
-
-      <button class="ctrl-btn" (click)="player.toggleShuffle()"
-        [class.active]="player.isShuffled()" title="Shuffle">
-        <i class="bi bi-shuffle"></i>
-      </button>
-
-      <button class="ctrl-btn" (click)="player.skipPrev()" title="Previous">
-        <i class="bi bi-skip-backward-fill"></i>
-      </button>
-
-      <button class="ctrl-btn play-btn" (click)="player.togglePlay()">
-        <i class="bi" [class.bi-play-fill]="!player.isPlaying()"
-           [class.bi-pause-fill]="player.isPlaying()"></i>
-      </button>
-
-      <button class="ctrl-btn" (click)="player.skipNext()" title="Next">
-        <i class="bi bi-skip-forward-fill"></i>
-      </button>
-
-      <button class="ctrl-btn" (click)="player.toggleRepeat()"
-        [class.active]="player.repeatMode() !== 'none'" title="Repeat">
-        <i class="bi" [class.bi-repeat]="player.repeatMode() !== 'one'"
-           [class.bi-repeat-1]="player.repeatMode() === 'one'"></i>
-      </button>
-
-    </div>
-
-    <!-- Progress Bar -->
-    <div class="d-flex align-items-center gap-2 w-100">
-      <span class="time-label">{{ player.formatTime(player.currentTime()) }}</span>
-      <input
-        type="range"
-        class="progress-bar flex-grow-1"
-        [min]="0"
-        [max]="player.duration() || 0"
-        [value]="player.currentTime()"
-        (input)="onSeek($event)"
-        step="0.1">
-      <span class="time-label">{{ player.formatTime(player.duration()) }}</span>
+    <!-- Right: Volume -->
+    <div class="d-flex align-items-center gap-2" style="min-width: 150px; justify-content: flex-end;">
+      <i class="bi" [class.bi-volume-mute-fill]="player.volume() === 0"
+         [class.bi-volume-down-fill]="player.volume() > 0 && player.volume() < 50"
+         [class.bi-volume-up-fill]="player.volume() >= 50"></i>
+      <input type="range" class="volume-bar" min="0" max="100" [value]="player.volume()"
+        (input)="onVolume($event)" style="width: 90px;">
     </div>
 
   </div>
-
-  <!-- Right: Volume -->
-  <div class="d-flex align-items-center gap-2" style="min-width: 150px; justify-content: flex-end;">
-    <i class="bi" [class.bi-volume-mute-fill]="player.volume() === 0"
-       [class.bi-volume-down-fill]="player.volume() > 0 && player.volume() < 50"
-       [class.bi-volume-up-fill]="player.volume() >= 50"></i>
-    <input
-      type="range"
-      class="volume-bar"
-      min="0" max="100"
-      [value]="player.volume()"
-      (input)="onVolume($event)"
-      style="width: 90px;">
-  </div>
-
 </div>

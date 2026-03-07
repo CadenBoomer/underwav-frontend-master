@@ -26,47 +26,65 @@ export class ProfileComponent implements OnInit {
     show_email: false
   };
 
-  constructor(private authService: AuthService, private cdr: ChangeDetectorRef, private http: HttpClient) { }
-
   avatarPreview: string | null = null;
   followTab: 'followers' | 'following' = 'followers';
   followers: any[] = [];
   following: any[] = [];
 
+  constructor(private authService: AuthService, private cdr: ChangeDetectorRef, private http: HttpClient) { }
+
   ngOnInit(): void {
     this.authService.getProfile().subscribe({
-      next: profile => { this.user = profile; this.cdr.markForCheck(); },
+      next: profile => {
+        this.user = {
+          ...profile,
+          avatar: profile.avatar
+            ? profile.avatar.startsWith('http')
+              ? profile.avatar
+              : `http://localhost:3000/uploads/images/${profile.avatar}`
+            : null
+        };
+        this.cdr.markForCheck();
+      },
       error: err => console.error('Failed to load profile', err)
     });
 
-    // Load following first, then followers, so we can mark isFollowing
     this.http.get<any[]>(
-      'http://localhost:3000/api/follows/following',
+  'http://localhost:3000/api/follows/following',
+  this.authService.getAuthHeaders()
+).subscribe({
+  next: (following) => {
+    this.following = following.map(f => ({
+      ...f,
+      avatar: f.avatar
+        ? f.avatar.startsWith('http') ? f.avatar : `http://localhost:3000/uploads/images/${f.avatar}`
+        : null
+    }));
+    const followingIds = new Set(following.map(f => f.id));
+
+    this.http.get<any[]>(
+      'http://localhost:3000/api/follows/followers',
       this.authService.getAuthHeaders()
     ).subscribe({
-      next: (following) => {
-        this.following = following;
-        const followingIds = new Set(following.map(f => f.id));
-
-        this.http.get<any[]>(
-          'http://localhost:3000/api/follows/followers',
-          this.authService.getAuthHeaders()
-        ).subscribe({
-          next: (followers) => {
-            this.followers = followers.map(f => ({
-              ...f,
-              isFollowing: followingIds.has(f.id)
-            }));
-            this.cdr.markForCheck();
-          },
-          error: (err) => console.error('Followers error:', err)
-        });
-
+      next: (followers) => {
+        this.followers = followers.map(f => ({
+          ...f,
+          isFollowing: followingIds.has(f.id),
+          avatar: f.avatar
+            ? f.avatar.startsWith('http') ? f.avatar : `http://localhost:3000/uploads/images/${f.avatar}`
+            : null
+        }));
         this.cdr.markForCheck();
       },
-      error: (err) => console.error('Following error:', err)
+      error: (err) => console.error('Followers error:', err)
     });
+
+    this.cdr.markForCheck();
+  },
+  error: (err) => console.error('Following error:', err)
+});
   }
+
 
   toggleFollowBack(follower: any) {
     if (follower.isFollowing) {
@@ -140,7 +158,6 @@ export class ProfileComponent implements OnInit {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
 
-    // Show preview immediately
     const reader = new FileReader();
     reader.onload = () => {
       this.avatarPreview = reader.result as string;
@@ -148,16 +165,15 @@ export class ProfileComponent implements OnInit {
     };
     reader.readAsDataURL(file);
 
-    // Upload to backend
     const formData = new FormData();
     formData.append('avatar', file);
 
-    this.http.patch(
+    this.http.patch<{ avatar: string }>(
       'http://localhost:3000/api/auth/avatar',
       formData,
       this.authService.getAuthHeaders()
     ).subscribe({
-      next: (res: any) => {
+      next: (res) => {
         this.user.avatar = res.avatar;
         this.avatarPreview = null;
         this.cdr.markForCheck();

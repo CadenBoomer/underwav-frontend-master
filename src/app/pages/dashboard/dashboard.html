@@ -61,9 +61,12 @@
 
       <!-- Lyrics Preview -->
       <div *ngIf="currentTrack.lyrics" class="lyrics-preview">
-        <span class="lyrics-label">Lyrics</span>
-        <p class="lyrics-text">
-          {{ currentTrack.lyrics | slice:0:120 }}{{ currentTrack.lyrics!.length > 120 ? '…' : '' }}
+        <div class="lyrics-header" (click)="lyricsExpanded = !lyricsExpanded">
+          <span class="lyrics-label">Lyrics</span>
+          <span class="lyrics-toggle">{{ lyricsExpanded ? '▲ Hide' : '▼ Show' }}</span>
+        </div>
+        <p class="lyrics-text" [class.lyrics-collapsed]="!lyricsExpanded">
+          {{ currentTrack.lyrics }}
         </p>
       </div>
 
@@ -97,7 +100,7 @@
             <div class="comment-actions">
               <button class="comment-like-btn" [class.comment-like-active]="comment.isLiked"
                 (click)="toggleCommentLike(comment)">
-                {{ comment.isLiked ? '❤️' : '🤍' }} {{ comment.likes_count || 0 }}
+                ♥ {{ comment.likes_count || 0 }}
               </button>
               <button class="comment-delete-btn" (click)="deleteComment(comment)">✕</button>
             </div>
