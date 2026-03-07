@@ -8,9 +8,10 @@
         <span>Underwav</span>
       </a>
 
-      <ul class="navbar-nav nav-underline flex-row gap-3">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/" routerLinkActive="active">Home</a>
+      <ul class="navbar-nav flex-row gap-3">
+        <li class="nav-item" *ngIf="isLoggedIn">
+          <a class="nav-link" routerLink="/home" routerLinkActive="active"
+            [routerLinkActiveOptions]="{exact: true}">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" routerLink="/discover" routerLinkActive="active">Discover</a>
@@ -60,7 +61,7 @@
 
     <!-- Right Section -->
     <div class="d-flex">
-      <ul class="navbar-nav nav-underline flex-row gap-3 me-3">
+      <ul class="navbar-nav flex-row gap-3 me-3">
 
         <!-- Not Logged In -->
         <ng-container *ngIf="!isLoggedIn">

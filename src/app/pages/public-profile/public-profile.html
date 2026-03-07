@@ -28,8 +28,10 @@
         </div>
       </div>
 
+
       <!-- Follow Button -->
-      <button *ngIf="isLoggedIn" class="follow-btn" [class.follow-btn-active]="isFollowing" (click)="toggleFollow()">
+      <button *ngIf="isLoggedIn && !isOwnProfile" class="follow-btn" [class.follow-btn-active]="isFollowing"
+        (click)="toggleFollow()">
         {{ isFollowing ? 'Following' : 'Follow' }}
       </button>
     </div>
@@ -94,7 +96,7 @@
               <div class="comment-actions">
                 <button class="comment-like-btn" [class.comment-like-active]="comment.isLiked"
                   (click)="toggleCommentLike(comment)">
-                  {{ comment.isLiked ? '❤️' : '🤍' }} {{ comment.likes_count || 0 }}
+                  ♥ {{ comment.likes_count || 0 }}
                 </button>
                 <button class="comment-delete-btn" *ngIf="comment.canDelete"
                   (click)="deleteComment(track, comment)">✕</button>
@@ -135,11 +137,15 @@
     <div class="users-grid">
       <div *ngFor="let follower of followers" class="user-row">
         <img [src]="follower.avatar || '/UnderwavLogo1.png'" class="user-thumb" alt="avatar">
-        <div class="user-name">{{ follower.username }}</div>
+        <div class="user-name" [routerLink]="['/profile', follower.id]" style="cursor:pointer">
+          {{ follower.username }}
+        </div>
+        <button *ngIf="isLoggedIn && follower.id !== currentUserId" class="follow-btn-sm"
+          [class.follow-btn-sm-active]="follower.isFollowing" (click)="toggleUserFollow(follower)">
+          {{ follower.isFollowing ? 'Following' : 'Follow' }}
+        </button>
       </div>
-      <div *ngIf="followers.length === 0" class="empty-section">
-        No followers yet.
-      </div>
+      <div *ngIf="followers.length === 0" class="empty-section">No followers yet.</div>
     </div>
   </div>
 
@@ -148,17 +154,19 @@
     <div class="users-grid">
       <div *ngFor="let follow of following" class="user-row">
         <img [src]="follow.avatar || '/UnderwavLogo1.png'" class="user-thumb" alt="avatar">
-        <div class="user-name">{{ follow.username }}</div>
+        <div class="user-name" [routerLink]="['/profile', follow.id]" style="cursor:pointer">
+          {{ follow.username }}
+        </div>
+        <button *ngIf="isLoggedIn && follow.id !== currentUserId" class="follow-btn-sm"
+          [class.follow-btn-sm-active]="follow.isFollowing" (click)="toggleUserFollow(follow)">
+          {{ follow.isFollowing ? 'Following' : 'Follow' }}
+        </button>
       </div>
-      <div *ngIf="following.length === 0" class="empty-section">
-        Not following anyone yet.
-      </div>
+      <div *ngIf="following.length === 0" class="empty-section">Not following anyone yet.</div>
     </div>
   </div>
 
-</div>
-
-<!-- Loading state -->
-<div *ngIf="!user" class="loading-state">
-  Loading profile...
-</div>
+  <!-- Loading state -->
+  <div *ngIf="!user" class="loading-state">
+    Loading profile...
+  </div>

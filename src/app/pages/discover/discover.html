@@ -1,4 +1,3 @@
-
 <div class="discover-page">
 
   <!-- Hero Banner -->
@@ -26,14 +25,16 @@
       </div>
     </div>
     <div class="tracks-grid">
-      <div *ngFor="let track of trendingTracks; let i = index"
-           class="track-row"
-           (click)="player.setQueue(trendingTracks, i)">
+      <div *ngFor="let track of trendingTracks; let i = index" class="track-row"
+        (click)="player.setQueue(trendingTracks, i)">
         <span class="track-rank">{{ i + 1 }}</span>
         <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
         <div class="track-meta">
           <div class="track-name">{{ track.title }}</div>
-          <div class="track-artist">{{ track.artist || 'Unknown Artist' }}</div>
+          <div class="track-artist" [routerLink]="['/profile', track.user_id]" style="cursor:pointer"
+            (click)="$event.stopPropagation()">
+            {{ track.artist || 'Unknown Artist' }}
+          </div>
         </div>
         <div class="track-stats">
           <span>👁 {{ track.views || 0 }}</span>
@@ -57,14 +58,15 @@
       </div>
     </div>
     <div class="tracks-grid">
-      <div *ngFor="let track of mostViewed; let i = index"
-           class="track-row"
-           (click)="player.setQueue(mostViewed, i)">
+      <div *ngFor="let track of mostViewed; let i = index" class="track-row" (click)="player.setQueue(mostViewed, i)">
         <span class="track-rank">{{ i + 1 }}</span>
         <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
         <div class="track-meta">
           <div class="track-name">{{ track.title }}</div>
-          <div class="track-artist">{{ track.artist || 'Unknown Artist' }}</div>
+          <div class="track-artist" [routerLink]="['/profile', track.user_id]" style="cursor:pointer"
+            (click)="$event.stopPropagation()">
+            {{ track.artist || 'Unknown Artist' }}
+          </div>
         </div>
         <div class="track-stats">
           <span>👁 {{ track.views || 0 }}</span>
@@ -88,14 +90,16 @@
       </div>
     </div>
     <div class="tracks-grid">
-      <div *ngFor="let track of recentTracks; let i = index"
-           class="track-row"
-           (click)="player.setQueue(recentTracks, i)">
+      <div *ngFor="let track of recentTracks; let i = index" class="track-row"
+        (click)="player.setQueue(recentTracks, i)">
         <span class="track-rank">{{ i + 1 }}</span>
         <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
         <div class="track-meta">
           <div class="track-name">{{ track.title }}</div>
-          <div class="track-artist">{{ track.artist || 'Unknown Artist' }}</div>
+          <div class="track-artist" [routerLink]="['/profile', track.user_id]" style="cursor:pointer"
+            (click)="$event.stopPropagation()">
+            {{ track.artist || 'Unknown Artist' }}
+          </div>
         </div>
         <div class="track-stats">
           <span>👁 {{ track.views || 0 }}</span>
@@ -119,10 +123,8 @@
       </div>
     </div>
     <div class="genre-grid">
-      <div *ngFor="let genre of genres"
-           class="genre-pill"
-           (click)="selectGenre(genre)"
-           [class.genre-active]="selectedGenre?.id === genre.id">
+      <div *ngFor="let genre of genres" class="genre-pill" (click)="selectGenre(genre)"
+        [class.genre-active]="selectedGenre?.id === genre.id">
         {{ genre.name }}
       </div>
     </div>
@@ -130,16 +132,18 @@
     <!-- Genre Tracks -->
     <div *ngIf="selectedGenre" class="tracks-grid mt-4">
       <div class="genre-tracks-header mb-3">
-        <span class="section-sub">Showing tracks in <strong style="color: #c8f04c">{{ selectedGenre.name }}</strong></span>
+        <span class="section-sub">Showing tracks in <strong style="color: #833dce">{{ selectedGenre.name
+            }}</strong></span>
       </div>
-      <div *ngFor="let track of genreTracks; let i = index"
-           class="track-row"
-           (click)="player.setQueue(genreTracks, i)">
+      <div *ngFor="let track of genreTracks; let i = index" class="track-row" (click)="player.setQueue(genreTracks, i)">
         <span class="track-rank">{{ i + 1 }}</span>
         <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
         <div class="track-meta">
           <div class="track-name">{{ track.title }}</div>
-          <div class="track-artist">{{ track.artist || 'Unknown Artist' }}</div>
+          <div class="track-artist" [routerLink]="['/profile', track.user_id]" style="cursor:pointer"
+            (click)="$event.stopPropagation()">
+            {{ track.artist || 'Unknown Artist' }}
+          </div>
         </div>
         <div class="track-stats">
           <span>👁 {{ track.views || 0 }}</span>

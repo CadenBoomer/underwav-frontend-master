@@ -57,6 +57,8 @@ export class Dashboard implements OnInit {
   ngOnInit(): void {
     this.loadUploads();
     this.loadGenres();
+
+
   }
 
   loadGenres() {
@@ -254,31 +256,31 @@ export class Dashboard implements OnInit {
   }
 
   toggleCommentLike(comment: any) {
-  if (comment.isLiked) {
-    this.http.delete(
-      `http://localhost:3000/api/comments/${comment.id}/like`,
-      this.auth.getAuthHeaders()
-    ).subscribe({
-      next: (res: any) => {
-        comment.isLiked = false;
-        comment.likes_count = res.likesCount;
-        this.cdr.markForCheck();
-      },
-      error: (err) => console.error('Unlike comment error:', err)
-    });
-  } else {
-    this.http.post(
-      `http://localhost:3000/api/comments/${comment.id}/like`,
-      {},
-      this.auth.getAuthHeaders()
-    ).subscribe({
-      next: (res: any) => {
-        comment.isLiked = true;
-        comment.likes_count = res.likesCount;
-        this.cdr.markForCheck();
-      },
-      error: (err) => console.error('Like comment error:', err)
-    });
+    if (comment.isLiked) {
+      this.http.delete(
+        `http://localhost:3000/api/comments/${comment.id}/like`,
+        this.auth.getAuthHeaders()
+      ).subscribe({
+        next: (res: any) => {
+          comment.isLiked = false;
+          comment.likes_count = res.likesCount;
+          this.cdr.markForCheck();
+        },
+        error: (err) => console.error('Unlike comment error:', err)
+      });
+    } else {
+      this.http.post(
+        `http://localhost:3000/api/comments/${comment.id}/like`,
+        {},
+        this.auth.getAuthHeaders()
+      ).subscribe({
+        next: (res: any) => {
+          comment.isLiked = true;
+          comment.likes_count = res.likesCount;
+          this.cdr.markForCheck();
+        },
+        error: (err) => console.error('Like comment error:', err)
+      });
+    }
   }
-}
 }

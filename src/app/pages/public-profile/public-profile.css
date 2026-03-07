@@ -459,3 +459,44 @@
     justify-content: center;
   }
 }
+
+.follow-btn-sm {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--muted);
+  padding: 0.25rem 0.9rem;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  cursor: pointer;
+  margin-left: auto;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.follow-btn-sm:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.follow-btn-sm-active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.comment-like-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+.comment-like-btn:hover { color: #ff6b6b; }
+
+.comment-like-active { 
+  color: #ff6b6b !important; 
+}

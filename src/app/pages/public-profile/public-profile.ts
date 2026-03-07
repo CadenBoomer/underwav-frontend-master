@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { PlayerService } from '../../services/playerservice';
 import { Track } from '../../services/media.service';
+import { RouterLink } from '@angular/router';
 
 interface PublicUser {
   id: number;
@@ -37,7 +38,7 @@ interface LikeableTrack extends Track {
 @Component({
   selector: 'app-public-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './public-profile.html',
   styleUrl: './public-profile.css',
 })
@@ -79,13 +80,24 @@ export class PublicProfile implements OnInit {
       this.loadAll();
     });
   }
-
   loadAll() {
     this.http.get<PublicUser>(`http://localhost:3000/api/auth/users/${this.profileId}`)
       .subscribe({
         next: (user) => { this.user = user; this.cdr.markForCheck(); },
         error: (err) => console.error('Profile error:', err)
       });
+
+    // Check if viewing own profile
+    if (this.isLoggedIn) {
+      this.auth.getProfile().subscribe({
+        next: (profile: any) => {
+          this.currentUserId = profile.id;
+          this.isOwnProfile = profile.id === this.profileId;
+          this.cdr.markForCheck();
+        },
+        error: () => { }
+      });
+    }
 
     this.http.get<Track[]>(`http://localhost:3000/api/media/public/user/${this.profileId}`)
       .subscribe({
@@ -104,6 +116,7 @@ export class PublicProfile implements OnInit {
           this.cdr.markForCheck();
         },
         error: (err) => console.error('Tracks error:', err)
+
       });
 
     this.http.get<any[]>(`http://localhost:3000/api/follows/followers/${this.profileId}`)
@@ -125,6 +138,20 @@ export class PublicProfile implements OnInit {
       ).subscribe({
         next: (res) => { this.isFollowing = res.isFollowing; this.cdr.markForCheck(); },
         error: (err) => console.error('Following status error:', err)
+      });
+    }
+    if (this.isLoggedIn) {
+      this.http.get<any[]>(
+        'http://localhost:3000/api/follows/following',
+        this.auth.getAuthHeaders()
+      ).subscribe({
+        next: (myFollowing) => {
+          const followingIds = new Set(myFollowing.map(f => f.id));
+          this.followers = this.followers.map(f => ({ ...f, isFollowing: followingIds.has(f.id) }));
+          this.following = this.following.map(f => ({ ...f, isFollowing: followingIds.has(f.id) }));
+          this.cdr.markForCheck();
+        },
+        error: () => { }
       });
     }
   }
@@ -186,11 +213,33 @@ export class PublicProfile implements OnInit {
     this.http.get<any>(`http://localhost:3000/api/comments/${track.id}`)
       .subscribe({
         next: (res) => {
-          track.comments = res.comments.map((c: any) => ({
+          const comments = res.comments.map((c: any) => ({
             ...c,
             isLiked: false,
-            canDelete: c.username === (this.auth as any).currentUsername || false
+            canDelete: c.user_id === this.currentUserId
           }));
+          track.comments = comments;
+
+          // Load liked status if logged in
+          if (this.isLoggedIn && comments.length > 0) {
+            const commentIds = comments.map((c: any) => c.id);
+            this.http.post(
+              'http://localhost:3000/api/comments/like-status',
+              { commentIds },
+              this.auth.getAuthHeaders()
+            ).subscribe({
+              next: (statusRes: any) => {
+                const likedIds = new Set(statusRes.likedIds);
+                track.comments = track.comments!.map(c => ({
+                  ...c,
+                  isLiked: likedIds.has(c.id)
+                }));
+                this.cdr.markForCheck();
+              },
+              error: () => { }
+            });
+          }
+
           this.cdr.markForCheck();
         },
         error: (err) => console.error('Comments error:', err)
@@ -238,7 +287,7 @@ export class PublicProfile implements OnInit {
 
     if (comment.isLiked) {
       this.http.delete(
-        `http://localhost:3000/api/comments/${comment.id}/like`,
+        `http://localhost:3000/api/comments/comment/${comment.id}/like`,
         this.auth.getAuthHeaders()
       ).subscribe({
         next: (res: any) => {
@@ -250,7 +299,7 @@ export class PublicProfile implements OnInit {
       });
     } else {
       this.http.post(
-        `http://localhost:3000/api/comments/${comment.id}/like`,
+        `http://localhost:3000/api/comments/comment/${comment.id}/like`,
         {},
         this.auth.getAuthHeaders()
       ).subscribe({
@@ -287,6 +336,35 @@ export class PublicProfile implements OnInit {
       ).subscribe({
         next: () => {
           this.isFollowing = true;
+          this.cdr.markForCheck();
+        },
+        error: (err) => console.error('Follow error:', err)
+      });
+    }
+  }
+
+  toggleUserFollow(user: any) {
+    if (!this.isLoggedIn) return;
+
+    if (user.isFollowing) {
+      this.http.delete(
+        `http://localhost:3000/api/follows/unfollow/${user.id}`,
+        this.auth.getAuthHeaders()
+      ).subscribe({
+        next: () => {
+          user.isFollowing = false;
+          this.cdr.markForCheck();
+        },
+        error: (err) => console.error('Unfollow error:', err)
+      });
+    } else {
+      this.http.post(
+        `http://localhost:3000/api/follows/follow/${user.id}`,
+        {},
+        this.auth.getAuthHeaders()
+      ).subscribe({
+        next: () => {
+          user.isFollowing = true;
           this.cdr.markForCheck();
         },
         error: (err) => console.error('Follow error:', err)

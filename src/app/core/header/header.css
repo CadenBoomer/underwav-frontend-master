@@ -119,3 +119,23 @@
   color: #555;
   flex-shrink: 0;
 }
+
+.nav-link {
+  color: #aaa;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.nav-link:hover {
+  color: #fff;
+}
+
+.nav-link.active {
+  color: #fff;
+  border-bottom: 2px solid #833dce;
+}
+

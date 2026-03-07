@@ -71,8 +71,10 @@ export class PlayerService {
     };
 
     this.currentTrack.set(resolvedTrack);
-    console.log('Cover URL:', resolvedTrack.coverUrl);
-    this.audio.src = `http://localhost:3000/uploads/audio/${resolvedTrack.filename}`;
+    const token = localStorage.getItem('token');
+    this.audio.src = token
+      ? `http://localhost:3000/api/media/${resolvedTrack.id}/stream?token=${token}`
+      : `http://localhost:3000/api/media/${resolvedTrack.id}/stream/public`;
     this.audio.load();
     this.audio.play().catch(err => console.warn('Playback error:', err));
   }
@@ -150,5 +152,5 @@ export class PlayerService {
     const s = Math.floor(seconds % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
   }
-  
+
 }

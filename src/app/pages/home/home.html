@@ -28,7 +28,10 @@
         <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
         <div class="track-meta">
           <div class="track-name">{{ track.title }}</div>
-          <div class="track-artist">{{ track.artist || 'Unknown Artist' }}</div>
+          <div class="track-artist" [routerLink]="['/profile', track.user_id]" style="cursor:pointer"
+            (click)="$event.stopPropagation()">
+            {{ track.artist || 'Unknown Artist' }}
+          </div>
         </div>
         <button class="track-play-btn">▶</button>
       </div>
@@ -49,7 +52,10 @@
         <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
         <div class="track-meta">
           <div class="track-name">{{ track.title }}</div>
-          <div class="track-artist">{{ track.artist || 'Unknown Artist' }}</div>
+          <div class="track-artist" [routerLink]="['/profile', track.user_id]" style="cursor:pointer"
+            (click)="$event.stopPropagation()">
+            {{ track.artist || 'Unknown Artist' }}
+          </div>
         </div>
         <button class="track-play-btn">▶</button>
       </div>
@@ -59,24 +65,22 @@
     </div>
   </section>
 
-<!-- Suggested Artists -->
-<section class="home-section">
-  <div class="section-header">
-    <h2 class="section-title">🎤 Suggested Artists</h2>
-    <p class="section-sub">Creators you might like</p>
-  </div>
-  <div class="artists-grid">
-    <div *ngFor="let artist of suggestedArtists" 
-         class="artist-card"
-         [routerLink]="['/profile', artist.id]">
-      <img [src]="artist.avatar || '/UnderwavLogo1.png'" class="artist-avatar" alt="avatar">
-      <div class="artist-name">{{ artist.username }}</div>
-      <div class="artist-tracks">{{ artist.track_count || 0 }} tracks</div>
+  <!-- Suggested Artists -->
+  <section class="home-section">
+    <div class="section-header">
+      <h2 class="section-title">🎤 Suggested Artists</h2>
+      <p class="section-sub">Creators you might like</p>
     </div>
-    <div *ngIf="suggestedArtists.length === 0" class="empty-section">
-      No suggestions yet.
+    <div class="artists-grid">
+      <div *ngFor="let artist of suggestedArtists" class="artist-card" [routerLink]="['/profile', artist.id]">
+        <img [src]="artist.avatar || '/UnderwavLogo1.png'" class="artist-avatar" alt="avatar">
+        <div class="artist-name">{{ artist.username }}</div>
+        <div class="artist-tracks">{{ artist.track_count || 0 }} tracks</div>
+      </div>
+      <div *ngIf="suggestedArtists.length === 0" class="empty-section">
+        No suggestions yet.
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
 </div>

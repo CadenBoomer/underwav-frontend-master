@@ -275,3 +275,14 @@
     display: none;
   }
 }
+
+.track-artist {
+  font-size: 0.8rem;
+  color: #888;
+  transition: color 0.2s;
+}
+
+.track-artist:hover {
+  color: #833dce;
+  text-decoration: underline;
+}

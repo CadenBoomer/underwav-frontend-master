@@ -29,21 +29,92 @@ export class ProfileComponent implements OnInit {
   constructor(private authService: AuthService, private cdr: ChangeDetectorRef, private http: HttpClient) { }
 
   avatarPreview: string | null = null;
+  followTab: 'followers' | 'following' = 'followers';
+  followers: any[] = [];
+  following: any[] = [];
 
   ngOnInit(): void {
-    console.log('ProfileComponent ngOnInit, fetching profile');
     this.authService.getProfile().subscribe({
-      next: profile => {
-        console.log('Profile data received', profile);
-          console.log('Profile data:', profile);
-        this.user = profile;
-        this.cdr.markForCheck(); // notify Angular change detector
-      },
+      next: profile => { this.user = profile; this.cdr.markForCheck(); },
       error: err => console.error('Failed to load profile', err)
+    });
+
+    // Load following first, then followers, so we can mark isFollowing
+    this.http.get<any[]>(
+      'http://localhost:3000/api/follows/following',
+      this.authService.getAuthHeaders()
+    ).subscribe({
+      next: (following) => {
+        this.following = following;
+        const followingIds = new Set(following.map(f => f.id));
+
+        this.http.get<any[]>(
+          'http://localhost:3000/api/follows/followers',
+          this.authService.getAuthHeaders()
+        ).subscribe({
+          next: (followers) => {
+            this.followers = followers.map(f => ({
+              ...f,
+              isFollowing: followingIds.has(f.id)
+            }));
+            this.cdr.markForCheck();
+          },
+          error: (err) => console.error('Followers error:', err)
+        });
+
+        this.cdr.markForCheck();
+      },
+      error: (err) => console.error('Following error:', err)
+    });
+  }
+
+  toggleFollowBack(follower: any) {
+    if (follower.isFollowing) {
+      this.http.delete(
+        `http://localhost:3000/api/follows/unfollow/${follower.id}`,
+        this.authService.getAuthHeaders()
+      ).subscribe({
+        next: () => {
+          follower.isFollowing = false;
+          this.following = this.following.filter(f => f.id !== follower.id);
+          this.cdr.markForCheck();
+        },
+        error: (err) => console.error('Unfollow error:', err)
+      });
+    } else {
+      this.http.post(
+        `http://localhost:3000/api/follows/follow/${follower.id}`,
+        {},
+        this.authService.getAuthHeaders()
+      ).subscribe({
+        next: () => {
+          follower.isFollowing = true;
+          this.following = [...this.following, follower];
+          this.cdr.markForCheck();
+        },
+        error: (err) => console.error('Follow back error:', err)
+      });
+    }
+  }
+
+  unfollow(user: any) {
+    this.http.delete(
+      `http://localhost:3000/api/follows/unfollow/${user.id}`,
+      this.authService.getAuthHeaders()
+    ).subscribe({
+      next: () => {
+        this.following = this.following.filter(f => f.id !== user.id);
+        this.cdr.markForCheck();
+      },
+      error: (err) => console.error('Unfollow error:', err)
     });
   }
 
   saveProfile(formValue: Partial<UserProfile>) {
+    if (!formValue.username?.trim()) {
+      alert('Username is required.');
+      return;
+    }
     this.authService.updateProfile(formValue).subscribe({
       next: () => alert('Profile updated!'),
       error: err => console.error(err)

@@ -39,6 +39,46 @@
     <!-- Divider -->
     <div class="section-divider"></div>
 
+    <!-- Followers / Following -->
+    <div class="profile-section">
+      <div class="follow-tabs">
+        <button class="follow-tab-btn" [class.follow-tab-active]="followTab === 'followers'"
+          (click)="followTab = 'followers'">
+          Followers <span class="follow-count">{{ followers.length }}</span>
+        </button>
+        <button class="follow-tab-btn" [class.follow-tab-active]="followTab === 'following'"
+          (click)="followTab = 'following'">
+          Following <span class="follow-count">{{ following.length }}</span>
+        </button>
+      </div>
+
+      <!-- Followers List -->
+      <div *ngIf="followTab === 'followers'" class="users-grid">
+        <div *ngFor="let follower of followers" class="user-row">
+          <img [src]="follower.avatar || '/UnderwavLogo1.png'" class="user-thumb" alt="avatar">
+          <div class="user-name">{{ follower.username }}</div>
+          <button class="unfollow-btn" [class.following-back]="follower.isFollowing"
+            (click)="toggleFollowBack(follower)">
+            {{ follower.isFollowing ? 'Following' : 'Follow Back' }}
+          </button>
+        </div>
+        <div *ngIf="followers.length === 0" class="empty-section">No followers yet.</div>
+      </div>
+
+      <!-- Following List -->
+      <div *ngIf="followTab === 'following'" class="users-grid">
+        <div *ngFor="let follow of following" class="user-row">
+          <img [src]="follow.avatar || '/UnderwavLogo1.png'" class="user-thumb" alt="avatar">
+          <div class="user-name">{{ follow.username }}</div>
+          <button class="unfollow-btn" (click)="unfollow(follow)">Unfollow</button>
+        </div>
+        <div *ngIf="following.length === 0" class="empty-section">Not following anyone yet.</div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="section-divider"></div>
+
     <!-- Edit Profile -->
     <div class="profile-section">
       <h2 class="section-title">Edit Profile</h2>
