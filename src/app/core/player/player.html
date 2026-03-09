@@ -9,7 +9,7 @@
         <div class="expand-info">
           <h2 class="expand-title">{{ player.currentTrack()!.title }}</h2>
           <div class="expand-artist" [routerLink]="['/profile', player.currentTrack()!.user_id]" (click)="expanded.set(false)">
-            {{ player.currentTrack()!.artist || 'Unknown Artist' }}
+            {{ player.currentTrack()!.username || 'Unknown Artist' }}
           </div>
           <div class="expand-genres" *ngIf="player.currentTrack()!.genres?.length">
             <span *ngFor="let genre of player.currentTrack()!.genres" class="expand-genre-tag">{{ genre.name }}</span>
@@ -38,7 +38,7 @@
       <img [src]="player.currentTrack()?.coverUrl || '/UnderwavLogo1.png'" class="player-cover rounded" alt="cover">
       <div class="track-info overflow-hidden">
         <div class="track-title text-truncate">{{ player.currentTrack()?.title || 'No track selected' }}</div>
-        <div class="track-artist text-truncate">{{ player.currentTrack()?.artist || '' }}</div>
+        <div class="track-artist text-truncate">{{ player.currentTrack()?.username || '' }}</div>
       </div>
       <span class="expand-hint" *ngIf="player.currentTrack()">{{ expanded() ? '▼' : '▲' }}</span>
     </div>

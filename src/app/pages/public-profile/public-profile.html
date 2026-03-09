@@ -11,6 +11,20 @@
         ◎ {{ user.city }} {{ user.country }}
       </p>
       <p class="hero-bio">{{ user.bio || 'No bio yet.' }}</p>
+      <div class="hero-meta d-flex gap-4 mt-3">
+        <div class="meta-item" *ngIf="user.email">
+          <span class="meta-label">Email</span>
+          <span class="meta-value">{{ user.email }}</span>
+        </div>
+        <div class="meta-item" *ngIf="user.first_name || user.last_name">
+          <span class="meta-label">Name</span>
+          <span class="meta-value">{{ user.first_name }} {{ user.last_name }}</span>
+        </div>
+        <div class="meta-item" *ngIf="user.phone">
+          <span class="meta-label">Phone</span>
+          <span class="meta-value">{{ user.phone }}</span>
+        </div>
+      </div>
 
       <!-- Stats -->
       <div class="hero-stats">
@@ -40,7 +54,7 @@
   <!-- Tabs -->
   <div class="profile-tabs">
     <button class="tab-btn" [class.tab-active]="activeTab === 'tracks'" (click)="setTab('tracks')">Tracks</button>
-    <button class="tab-btn" [class.tab-active]="activeTab === 'liked'" (click)="setTab('liked')">Liked</button>
+    <!-- <button class="tab-btn" [class.tab-active]="activeTab === 'liked'" (click)="setTab('liked')">Liked</button> -->
     <button class="tab-btn" [class.tab-active]="activeTab === 'followers'"
       (click)="setTab('followers')">Followers</button>
     <button class="tab-btn" [class.tab-active]="activeTab === 'following'"
@@ -55,7 +69,7 @@
         <!-- Track Row -->
         <div class="track-row">
           <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover"
-            (click)="player.setQueue(tracks, i)">
+            (click)="logTrack(tracks[i]); player.setQueue(tracks, i)">
           <div class="track-meta" (click)="player.setQueue(tracks, i)">
             <div class="track-name">{{ track.title }}</div>
             <div class="track-artist">{{ user.username }}</div>
@@ -117,7 +131,7 @@
   </div>
 
   <!-- Liked Tab -->
-  <div class="tab-content" *ngIf="activeTab === 'liked'">
+  <!-- <div class="tab-content" *ngIf="activeTab === 'liked'">
     <div class="tracks-grid">
       <div *ngFor="let track of likedTracks; let i = index" class="track-row" (click)="player.setQueue(likedTracks, i)">
         <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
@@ -130,7 +144,7 @@
         No liked tracks yet.
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Followers Tab -->
   <div class="tab-content" *ngIf="activeTab === 'followers'">

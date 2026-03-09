@@ -7,6 +7,7 @@ export interface Track {
   title: string;
   filename: string;
   artist?: string;
+  username?: string;
   coverUrl?: string | null;
   cover_image?: string | null;
   description?: string;  // add
