@@ -1,7 +1,26 @@
+<!-- The navbar structure:
+
+Left — logo + Home/Discover links (Home only shows when *ngIf="isLoggedIn")
+Center — the search bar with results dropdown
+Right — Sign In / Create Account when logged out; Dashboard / Upload / Profile / Logout when logged in -->
+
+
+<!-- 
+//Key template features:
+[(ngModel)]="searchQuery" — two-way binds the input to the TypeScript property
+(input)="onSearch()" — fires on every keystroke
+(focus)="showResults = true" — shows dropdown when you click the input
+(blur)="hideResults()" — hides it with the 150ms delay
+*ngIf="showResults && (searchTracks.length > 0 || searchArtists.length > 0)" — dropdown only appears if there are actual results
+*ngFor="let track of searchTracks; let i = index" — loops over results, tracking the index so playTrack(track, i) knows which position in the queue to start at -->
+
+
+<!-- navbar-expand-lg — on large screens the nav is horizontal, on smaller screens it collapses -->
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark custom-navbar px-3 shadow-sm">
   <div class="container-fluid d-flex align-items-center">
 
     <!-- Left Section (Brand + Nav) -->
+    <!-- d-flex — makes this div a flexbox container so the three sections (left, center, right) sit side by side -->
     <div class="d-flex align-items-center gap-4">
       <a class="navbar-brand d-flex align-items-center gap-2 mb-0" routerLink="/" routerLinkActive="active">
         <img src="/UnderwavLogo1.png" alt="Underwav logo" height="100" width="60">
@@ -20,15 +39,20 @@
     </div>
 
     <!-- Center Section -->
+    <!-- flex-grow-1 — this center div expands to fill all available space between the left and right sections -->
     <div class="flex-grow-1 px-4 d-flex justify-content-center">
       <div style="width: 700px; position: relative;">
         <input class="form-control search-input" type="search" placeholder="Search tracks or artists"
           [(ngModel)]="searchQuery" (input)="onSearch()" (focus)="showResults = true" (blur)="hideResults()">
 
         <!-- Results Dropdown -->
+        <!-- The dropdown only renders if showResults is true AND there is at least one track or artist result. So it won't show an empty box. -->
         <div class="search-dropdown" *ngIf="showResults && (searchTracks.length > 0 || searchArtists.length > 0)">
 
           <!-- Tracks -->
+          <!-- *ngFor loops over every track in searchTracks and renders a row for each one
+          let i = index captures the position number so you can pass it to playTrack(track, i)
+            (mousedown) instead of (click) — as discussed, fires before blur so the track click isn't eaten by hideResults() -->
           <div *ngIf="searchTracks.length > 0">
             <div class="search-section-label">Tracks</div>
             <div *ngFor="let track of searchTracks; let i = index" class="search-result-row"
@@ -64,6 +88,8 @@
       <ul class="navbar-nav flex-row gap-3 me-3">
 
         <!-- Not Logged In -->
+        <!-- ng-container is an invisible wrapper — it lets you use *ngIf without adding an extra HTML element to the DOM. 
+          Everything inside only renders when the user is NOT logged in. -->
         <ng-container *ngIf="!isLoggedIn">
           <li class="nav-item">
             <a class="nav-link" routerLink="/login" routerLinkActive="active">Sign In</a>
@@ -74,6 +100,7 @@
         </ng-container>
 
         <!-- Logged In -->
+          <!-- And this block only renders when they ARE logged in — showing Dashboard, Upload, Profile, and Logout. -->
         <ng-container *ngIf="isLoggedIn">
           <li class="nav-item">
             <a class="nav-link" routerLink="/dashboard" routerLinkActive="active"

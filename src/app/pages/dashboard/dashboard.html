@@ -1,5 +1,8 @@
 <!-- Section Header -->
+<!-- totalTracks === 1 ? 'track' : 'tracks' is a ternary — shows "1 track" instead of "1 tracks" when there's only one. 
+  Small grammar detail. -->
 <div class="uploads-header d-flex align-items-baseline gap-3 mb-4">
+  
   <h2 class="section-title">My Uploads</h2>
   <span class="track-count">{{ totalTracks }} {{ totalTracks === 1 ? 'track' : 'tracks' }} total</span>
   <!-- <span class="track-count">{{ uploads.length === 1 ? 'There is 1 track' : 'There are ' + uploads.length + ' tracks' }}
@@ -7,17 +10,21 @@
 </div>
 
 <!-- Empty State -->
+<!-- Only shows when there are no uploads. Same empty state pattern you've seen before. -->
 <div *ngIf="uploads.length === 0" class="empty-state text-center py-5">
   <div class="empty-icon">♪</div>
   <p>No uploads yet. Drop your first track.</p>
 </div>
 
 <!-- Manual Carousel -->
+<!-- Only renders the whole carousel if there's at least one upload. -->
 <div *ngIf="uploads.length > 0" class="uploads-carousel">
 
   <div class="track-card d-flex gap-4 align-items-start">
 
     <!-- Cover Art -->
+    <!-- Clicking the cover art plays the track. The overlay with the play icon is hidden 
+      by default and appears on hover via CSS. alt="{{ currentTrack.title }}" dynamically sets the alt text to the track title. -->
     <div class="cover-wrap" (click)="player.setQueue(uploads, activeIndex)">
       <img [src]="currentTrack.coverUrl || '/UnderwavLogo1.png'" class="cover-art" alt="{{ currentTrack.title }}">
       <div class="cover-overlay">
@@ -26,6 +33,9 @@
     </div>
 
     <!-- Track Info -->
+    <!-- Shows the current position like "#2 / 5". 
+      The privacy badge dynamically applies either badge-public (purple) or badge-private (red) class and shows the 
+      right text based on is_public. -->
     <div class="track-details flex-grow-1">
       <div class="track-number mb-1">
         #{{ activeIndex + 1 }} / {{ uploads.length }}
@@ -60,6 +70,9 @@
       </div>
 
       <!-- Lyrics Preview -->
+      <!-- Only shows if the track has lyrics. Clicking the header toggles lyricsExpanded directly inline —
+         no separate method needed since it's just flipping a boolean. The lyrics-collapsed class sets max-height: 0 to hide the 
+         text, same animation trick as the player expand panel. -->
       <div *ngIf="currentTrack.lyrics" class="lyrics-preview">
         <div class="lyrics-header" (click)="lyricsExpanded = !lyricsExpanded">
           <span class="lyrics-label">Lyrics</span>
@@ -71,6 +84,7 @@
       </div>
 
       <!-- Actions -->
+      <!-- Three action buttons. The comments button text swaps between "Comments" and "Hide Comments" based on showComments. -->
       <div class="d-flex gap-2 mt-4">
         <button class="btn-play-track" (click)="player.setQueue(uploads, activeIndex)">▶ Play</button>
         <button class="btn-edit-track" (click)="openEdit(currentTrack)">✎ Edit</button>
@@ -83,6 +97,8 @@
       <div class="comments-section" *ngIf="showComments">
 
         <!-- Comment Input -->
+        <!-- (keydown.enter)="submitComment()" — pressing Enter submits the comment, same as clicking Post. 
+          [(ngModel)]="newComment" two-way binds to the input. -->
         <div class="comment-input-row">
           <input class="comment-input" type="text" placeholder="Add a comment..." [(ngModel)]="newComment"
             (keydown.enter)="submitComment()">
@@ -90,6 +106,9 @@
         </div>
 
         <!-- Comments List -->
+        <!-- comment.created_at | date:'short' — the | is an Angular pipe. 
+          It transforms the raw timestamp from the database into a readable short date format like "3/11/26, 2:30 PM". 
+          [class.comment-like-active]="comment.isLiked" turns the heart red when liked. -->
         <div class="comments-list">
           <div *ngFor="let comment of comments" class="comment-row">
             <div class="comment-body">
@@ -117,6 +136,8 @@
       <div class="carousel-controls d-flex align-items-center gap-3 mt-4">
         <button class="carousel-ctrl" (click)="prev()">← Prev</button>
 
+        <!-- Smart switching — if there are 10 or fewer tracks, shows clickable dots. 
+         If there are more than 10, dots would be too many so it shows a "3 / 15" counter instead. -->
         <div class="dots d-flex gap-2" *ngIf="uploads.length <= 10">
           <button *ngFor="let track of uploads; let i = index" class="dot" [class.dot-active]="i === activeIndex"
             (click)="goToSlide(i)">
@@ -131,6 +152,8 @@
       </div>
 
       <!-- Page Controls -->
+      <!-- Only shows if there's more than one page. [disabled]="currentPage === 1" greys out the 
+        Previous button on the first page, and [disabled]="currentPage === totalPages" greys out Next on the last page. -->
       <div class="d-flex align-items-center justify-content-center gap-3 mt-3" *ngIf="totalPages > 1">
         <button class="carousel-ctrl" (click)="prevPage()" [disabled]="currentPage === 1">
           « Previous Page
@@ -142,6 +165,8 @@
       </div>
 
       <!-- Edit Modal -->
+      <!-- Two separate elements — the dark backdrop behind the modal and the modal itself. 
+        Clicking the backdrop closes the modal. Both only render when editOpen is true. -->
       <div class="modal-backdrop" *ngIf="editOpen" (click)="closeEdit()"></div>
       <div class="edit-modal" *ngIf="editOpen">
 
@@ -151,8 +176,12 @@
         </div>
 
         <div class="edit-modal-body">
-
+          <div *ngIf="editMessage" class="edit-message">{{ editMessage }}</div>
           <!-- Cover Image -->
+          <!-- editCoverInput.click() — #editCoverInput is a template reference variable, it gives you a direct handle to that input 
+            element. Clicking the cover image programmatically triggers the hidden file input. The image source checks
+             editCoverPreview 
+            first (new image selected), then currentTrack.coverUrl (existing cover), then falls back to the logo. -->
           <div class="edit-cover-row">
             <div class="edit-cover-wrap" (click)="editCoverInput.click()">
               <img [src]="editCoverPreview || currentTrack.coverUrl || '/UnderwavLogo1.png'" class="edit-cover-img"
@@ -189,6 +218,9 @@
                 <button type="button" class="remove-btn" (click)="removeEditGenre(i)">×</button>
               </span>
             </div>
+            <!-- [ngValue]="genre" instead of just value — regular value only works with strings, 
+             [ngValue] lets you bind the whole genre object so editCurrentGenre gets the full {id, name} object when selected,
+              not just a string. -->
             <select class="field-input field-select" [(ngModel)]="editCurrentGenre" (change)="addEditGenre()">
               <option [ngValue]="null" disabled selected>Add a genre...</option>
               <option *ngFor="let genre of allGenres" [ngValue]="genre">{{ genre.name }}</option>
@@ -213,6 +245,7 @@
           <button class="btn-danger-sm" (click)="deleteTrack()">🗑 Delete</button>
           <div class="d-flex gap-2 ms-auto">
             <button class="btn-cancel" (click)="closeEdit()">Cancel</button>
+            <!-- Button is disabled while saving to prevent double submissions. Text swaps to "Saving..." as feedback. -->
             <button class="btn-save" (click)="saveEdit()" [disabled]="saving">
               {{ saving ? 'Saving...' : 'Save Changes' }}
             </button>

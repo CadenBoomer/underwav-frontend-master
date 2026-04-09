@@ -1,16 +1,20 @@
 <div class="home-page">
 
   <!-- Continue Listening -->
+   <!-- Whole section is hidden until there's actually a track loaded in the player.
+     No point showing "Continue Listening" if nothing has been played yet. -->
   <section class="home-section" *ngIf="player.currentTrack()">
     <div class="section-header">
       <h2 class="section-title">▶ Continue Listening</h2>
       <p class="section-sub">Pick up where you left off</p>
     </div>
+    <!-- Wraps the track in an array [] because setQueue always expects an array. The ! just tells 
+     TypeScript "trust me this isn't null." Starts at index 0 since there's only one track in the array. -->
     <div class="continue-card" (click)="player.setQueue([player.currentTrack()!], 0)">
       <img [src]="player.currentTrack()!.coverUrl || '/UnderwavLogo1.png'" class="continue-cover" alt="cover">
       <div class="continue-info">
         <div class="continue-title">{{ player.currentTrack()!.title }}</div>
-        <div class="continue-artist">{{ player.currentTrack()!.artist || 'Unknown Artist' }}</div>
+        <div class="continue-artist">{{ player.currentTrack()!.artist || player.currentTrack()!.username ||'Unknown Artist' }}</div>
       </div>
       <button class="continue-play-btn">▶</button>
     </div>
@@ -22,15 +26,21 @@
       <h2 class="section-title">From People You Follow</h2>
       <p class="section-sub">Latest from your network</p>
     </div>
+    <!-- Loops over the tracks, clicking any row loads the whole list as a queue and starts at that position. -->
     <div class="tracks-grid">
       <div *ngFor="let track of followedTracks; let i = index" class="track-row"
         (click)="player.setQueue(followedTracks, i)">
         <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
         <div class="track-meta">
           <div class="track-name">{{ track.title }}</div>
+          
+          <!-- $event.stopPropagation() is the key thing here. Without it, clicking the artist name would trigger TWO things — 
+           navigate to their profile AND play the track, because the click would bubble up to the parent row's click handler. 
+           stopPropagation() stops the click from travelling up so only the navigation happens. -->
+           
           <div class="track-artist" [routerLink]="['/profile', track.user_id]" style="cursor:pointer"
             (click)="$event.stopPropagation()">
-            {{ track.artist || 'Unknown Artist' }}
+            {{ track.artist || track.username || 'Unknown Artist' }}
           </div>
         </div>
         <button class="track-play-btn">▶</button>
@@ -54,7 +64,7 @@
           <div class="track-name">{{ track.title }}</div>
           <div class="track-artist" [routerLink]="['/profile', track.user_id]" style="cursor:pointer"
             (click)="$event.stopPropagation()">
-            {{ track.artist || 'Unknown Artist' }}
+            {{ track.artist || track.username || 'Unknown Artist' }}
           </div>
         </div>
         <button class="track-play-btn">▶</button>

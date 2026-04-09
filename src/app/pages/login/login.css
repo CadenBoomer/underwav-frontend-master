@@ -124,3 +124,12 @@
 .auth-link:hover {
   text-decoration: underline;
 }
+
+.auth-message {
+  background: #1e1e1e;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+}

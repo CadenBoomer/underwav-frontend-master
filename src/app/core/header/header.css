@@ -1,3 +1,15 @@
+
+/* CSS Highlights
+ClassPurpose.custom-navbarSets navbar background to near-black #121212.
+search-input -Dark styled input, turns purple border on focus (#833dce).
+search-dropdown -Absolutely positioned below the input, scrollable, dark card style
+.search-section-labelTiny uppercase "Tracks" / "Artists" category headers
+.search-result-rowFlexbox row for each result — thumbnail + text + badge
+.search-thumb-roundMakes artist avatars circular.nav-link
+.activePurple underline on the currently active route
+The purple (#833dce) is your brand accent color used consistently for focus states and active links.
+ */
+
 .logo {
   height: 40px;
   width: auto;
@@ -11,6 +23,8 @@
   display: contents;
 }
 
+/* transition: border-color 0.2s means the border color change on focus animates smoothly over 
+0.2 seconds instead of snapping instantly. */
 .search-input {
   background: #1e1e1e;
   border: 1px solid #2a2a2a;
@@ -23,6 +37,8 @@
   transition: border-color 0.2s;
 }
 
+/* On focus the border turns purple. 
+box-shadow: none removes Bootstrap's default blue glow outline that would normally appear on focus. */
 .search-input:focus {
   border-color: #833dce;
   box-shadow: none;
@@ -38,6 +54,8 @@
   border-color: #2a2a2a;
 }
 
+/* This one is repeated specifically for when Bootstrap's 
+.form-control class is also on the element. Bootstrap has high specificity styles that would override your custom ones, so you need to target .form-control directly to win that fight. */
 .search-input.form-control:focus {
   background: #1e1e1e;
   color: #fff;
@@ -45,6 +63,12 @@
   box-shadow: none;
 }
 
+/* 
+position: absolute — floats the dropdown out of the normal page flow so it overlays content below
+top: calc(100% + 8px) — positions it just below the input with an 8px gap
+left: 0; right: 0 — stretches it to match the exact width of the input
+z-index: 2000 — makes sure it appears on top of everything else on the page
+max-height: 400px; overflow-y: auto — if there are lots of results the dropdown won't grow forever, it caps at 400px and becomes scrollable */
 .search-dropdown {
   position: absolute;
   top: calc(100% + 8px);
@@ -68,6 +92,8 @@
   font-family: 'Syne', sans-serif;
 }
 
+/* Each row is a flex row so the thumbnail, text, and badge line up horizontally. 
+The hover state gives a subtle background highlight so the user knows which result they're about to click. */
 .search-result-row {
   display: flex;
   align-items: center;
@@ -98,6 +124,8 @@
   min-width: 0;
 }
 
+/* If a track title is really long, instead of 
+wrapping onto two lines or overflowing the container, it gets cut off with ... at the end. */
 .search-name {
   font-size: 0.875rem;
   font-weight: 500;
@@ -120,6 +148,8 @@
   flex-shrink: 0;
 }
 
+/* All links always have a 2px solid transparent bottom border — this is so the active purple underline
+ appearing doesn't shift the layout. The space is always reserved, it just becomes visible when active.  */
 .nav-link {
   color: #aaa;
   font-family: 'DM Sans', sans-serif;

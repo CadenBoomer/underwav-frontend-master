@@ -35,6 +35,8 @@
 }
 
 /* Cover */
+/* On hover the cover art scales up slightly and the dark overlay with the play icon fades in. 
+inset: 0 is shorthand for top: 0; right: 0; bottom: 0; left: 0 — stretches the overlay to fill the whole cover. */
 .cover-wrap {
   position: relative;
   width: 220px;
@@ -744,4 +746,14 @@
 
 .lyrics-collapsed {
   max-height: 0;
+}
+
+.edit-message {
+  background: #1e1e1e;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
 }

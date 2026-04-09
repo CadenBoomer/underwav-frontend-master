@@ -39,10 +39,12 @@
   color: #fff;
 }
 
+/* The green color (#1db954 — same green as Spotify uses) applied to shuffle and repeat when they're turned on. */
 .ctrl-btn.active {
-  color: #1db954;
+  color: #833dce;
 }
 
+/* The !important on color overrides Bootstrap. On hover it scales up slightly for a tactile feel. */
 .play-btn {
   background: #fff;
   color: #000 !important;
@@ -69,6 +71,9 @@
 }
 
 /* Progress & Volume range styling */
+/* Browser default range inputs are ugly. appearance: none strips all default browser styling so you can 
+fully custom style them. ::-webkit-slider-thumb targets the draggable circle handle.
+ On hover it turns green. */
 .progress-bar,
 .volume-bar {
   -webkit-appearance: none;
@@ -92,10 +97,12 @@
 
 .progress-bar:hover::-webkit-slider-thumb,
 .volume-bar:hover::-webkit-slider-thumb {
-  background: #1db954;
+  background: #833dce;
 }
 
-
+/* This is a classic CSS slide animation trick. You can't animate height: auto, but you can animate max-height. 
+When closed it's 0 (hidden), when open it's 400px. 
+The cubic-bezier is a custom easing curve that makes it feel snappy — fast at the start, slows down at the end. */
 .player-expand {
   background: #141414;
   border-top: 1px solid #2a2a2a;
@@ -220,6 +227,9 @@
   font-size: 0.8rem;
 }
 
+
+/* Fixed to the bottom of the viewport, stretches full width. 
+flex-direction: column stacks the expand panel on top of the player bar. */
 .player-container {
   position: fixed;
   bottom: 0;

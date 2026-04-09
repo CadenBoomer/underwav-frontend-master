@@ -1,5 +1,6 @@
 <div class="discover-page">
 
+  <!-- Only shows when the user is NOT logged in. Logged in users don't need the marketing landing section. -->
   <!-- Hero Banner -->
   <div class="hero-section" *ngIf="!isLoggedIn">
     <div class="hero-content">
@@ -27,15 +28,21 @@
     <div class="tracks-grid">
       <div *ngFor="let track of trendingTracks; let i = index" class="track-row"
         (click)="player.setQueue(trendingTracks, i)">
+
+        <!-- New compared to the home page — shows a rank number next to each track. 
+         i + 1 because arrays start at 0, so you add 1 to show 1, 2, 3 instead of 0, 1, 2. -->
         <span class="track-rank">{{ i + 1 }}</span>
         <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
         <div class="track-meta">
           <div class="track-name">{{ track.title }}</div>
           <div class="track-artist" [routerLink]="['/profile', track.user_id]" style="cursor:pointer"
             (click)="$event.stopPropagation()">
-            {{ track.artist || 'Unknown Artist' }}
+            {{ track.artist || track.username || 'Unknown Artist' }}
           </div>
         </div>
+         <!-- shows view count, like count, and comment count for each track. 
+          The || 0 fallback means if any of those values are missing from the backend, it shows 0 instead of 
+          nothing. -->
         <div class="track-stats">
           <span>👁 {{ track.views || 0 }}</span>
           <span>❤️ {{ track.likes_count || 0 }}</span>
@@ -65,7 +72,7 @@
           <div class="track-name">{{ track.title }}</div>
           <div class="track-artist" [routerLink]="['/profile', track.user_id]" style="cursor:pointer"
             (click)="$event.stopPropagation()">
-            {{ track.artist || 'Unknown Artist' }}
+            {{ track.artist || track.username || 'Unknown Artist' }}
           </div>
         </div>
         <div class="track-stats">
@@ -98,7 +105,7 @@
           <div class="track-name">{{ track.title }}</div>
           <div class="track-artist" [routerLink]="['/profile', track.user_id]" style="cursor:pointer"
             (click)="$event.stopPropagation()">
-            {{ track.artist || 'Unknown Artist' }}
+            {{ track.artist || track.username || 'Unknown Artist' }}
           </div>
         </div>
         <div class="track-stats">
@@ -130,11 +137,16 @@
     </div>
 
     <!-- Genre Tracks -->
+     <!-- The genre tracks section only appears once a genre has been selected. -->
     <div *ngIf="selectedGenre" class="tracks-grid mt-4">
       <div class="genre-tracks-header mb-3">
         <span class="section-sub">Showing tracks in <strong style="color: #833dce">{{ selectedGenre.name
             }}</strong></span>
       </div>
+      <!-- Loops over all genres and renders a clickable pill for each. [class.genre-active]="selectedGenre?.id === 
+       genre.id" adds the active class
+        (purple fill) to whichever pill matches the currently selected genre. ?. again for safety 
+        in case nothing is selected yet. -->
       <div *ngFor="let track of genreTracks; let i = index" class="track-row" (click)="player.setQueue(genreTracks, i)">
         <span class="track-rank">{{ i + 1 }}</span>
         <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover">
@@ -142,7 +154,7 @@
           <div class="track-name">{{ track.title }}</div>
           <div class="track-artist" [routerLink]="['/profile', track.user_id]" style="cursor:pointer"
             (click)="$event.stopPropagation()">
-            {{ track.artist || 'Unknown Artist' }}
+            {{ track.artist || track.username || 'Unknown Artist' }}
           </div>
         </div>
         <div class="track-stats">

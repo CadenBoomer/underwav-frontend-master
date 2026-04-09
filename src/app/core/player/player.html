@@ -1,4 +1,10 @@
+<!-- This is the fixed wrapper that sticks everything to the bottom of the screen. 
+ It uses flex-direction: column so the expand panel sits directly above the player bar. -->
 <div class="player-container">
+
+  <!-- *ngIf="player.currentTrack()" — the whole expand panel only exists in the DOM if there's a track loaded
+[class.player-expand-open]="expanded()" — conditionally adds the player-expand-open 
+CSS class when expanded() is true, which changes max-height from 0 to 400px, creating the slide animation -->
 
   <!-- Expand Panel -->
   <div class="player-expand" [class.player-expand-open]="expanded()" *ngIf="player.currentTrack()">
@@ -8,9 +14,17 @@
         <img [src]="player.currentTrack()!.coverUrl || '/UnderwavLogo1.png'" class="expand-cover" alt="cover">
         <div class="expand-info">
           <h2 class="expand-title">{{ player.currentTrack()!.title }}</h2>
+
+          <!-- (click)="expanded.set(false)" — closes the panel when you click the artist name, since you're navigating away
+    The ! after currentTrack() is TypeScript's non-null assertion — you're telling TypeScript "I know this won't be null here, trust me" -->
+
           <div class="expand-artist" [routerLink]="['/profile', player.currentTrack()!.user_id]" (click)="expanded.set(false)">
-            {{ player.currentTrack()!.username || 'Unknown Artist' }}
+            
+            {{ player.currentTrack()!.username || player.currentTrack()!.artist ||'Unknown Artist' }}
           </div>
+
+          <!-- genres?.length — the ? is optional chaining. If genres is null/undefined it won't crash, it just returns undefined which is falsy so the *ngIf hides the section
+            *ngFor loops over genres and renders a pill/tag for each one -->
           <div class="expand-genres" *ngIf="player.currentTrack()!.genres?.length">
             <span *ngFor="let genre of player.currentTrack()!.genres" class="expand-genre-tag">{{ genre.name }}</span>
           </div>
@@ -22,6 +36,8 @@
             <div class="expand-label">Lyrics</div>
             <p class="expand-text expand-lyrics">{{ player.currentTrack()!.lyrics }}</p>
           </div>
+
+          <!-- Only shows the "No additional details" message if BOTH description AND lyrics are missing. -->
           <div class="expand-empty" *ngIf="!player.currentTrack()!.description && !player.currentTrack()!.lyrics">
             No additional details available.
           </div>
@@ -33,35 +49,53 @@
   <!-- Player Bar -->
   <div class="player d-flex align-items-center justify-content-between px-4 py-2 shadow-lg">
 
+
+    <!-- The whole left section (cover + track info) is clickable and triggers toggleExpand(). -->
     <!-- Left: Track Info -->
     <div class="d-flex align-items-center gap-3 player-track-info" style="min-width: 200px;" (click)="toggleExpand()">
       <img [src]="player.currentTrack()?.coverUrl || '/UnderwavLogo1.png'" class="player-cover rounded" alt="cover">
+      <!-- When content is too big for its container, by default it spills out. overflow: hidden just chops off anything that goes beyond the container's edges  -->
       <div class="track-info overflow-hidden">
+        <!-- This specifically handles text that's too long. Instead of chopping it off with a hard cut, it replaces the end with ... -->
         <div class="track-title text-truncate">{{ player.currentTrack()?.title || 'No track selected' }}</div>
         <div class="track-artist text-truncate">{{ player.currentTrack()?.username || '' }}</div>
       </div>
+
+      <!-- Expands mini player with arrows -->
       <span class="expand-hint" *ngIf="player.currentTrack()">{{ expanded() ? '▼' : '▲' }}</span>
     </div>
 
     <!-- Center: Controls + Progress -->
     <div class="d-flex flex-column align-items-center flex-grow-1 px-4" style="max-width: 600px;">
       <div class="d-flex align-items-center gap-3 mb-1">
+        <!-- Calls toggleShuffle() on click
+      [class.active]="player.isShuffled()" — adds the active class (green color) when shuffle is on -->
         <button class="ctrl-btn" (click)="player.toggleShuffle()" [class.active]="player.isShuffled()">
           <i class="bi bi-shuffle"></i>
         </button>
         <button class="ctrl-btn" (click)="player.skipPrev()">
           <i class="bi bi-skip-backward-fill"></i>
         </button>
+        <!-- Dynamically swaps between the play and pause Bootstrap icon depending on player.isPlaying() -->
         <button class="ctrl-btn play-btn" (click)="player.togglePlay()">
           <i class="bi" [class.bi-play-fill]="!player.isPlaying()" [class.bi-pause-fill]="player.isPlaying()"></i>
         </button>
         <button class="ctrl-btn" (click)="player.skipNext()">
           <i class="bi bi-skip-forward-fill"></i>
         </button>
+        <!-- Active (green) whenever repeat mode is anything other than 'none'
+        Swaps between the regular repeat icon and the repeat-one icon depending on the mode -->
         <button class="ctrl-btn" (click)="player.toggleRepeat()" [class.active]="player.repeatMode() !== 'none'">
-          <i class="bi" [class.bi-repeat]="player.repeatMode() !== 'one'" [class.bi-repeat-1]="player.repeatMode() === 'one'"></i>
+          <i class="bi" [class.bi-repeat]="player.repeatMode() !== 'one'"
+            [class.bi-repeat-1]="player.repeatMode() === 'one'"></i>
         </button>
       </div>
+
+      <!-- Progress Bar -->
+      <!-- [max]="player.duration() || 0" — sets the max to the track duration, falls back to 0 if duration isn't loaded yet
+        [value]="player.currentTime()" — keeps the slider position in sync with actual playback position
+        (input)="onSeek($event)" — fires as you drag, passing the event to onSeek()
+          step="0.1" — allows seeking in 0.1 second increments for smooth scrubbing -->
       <div class="d-flex align-items-center gap-2 w-100">
         <span class="time-label">{{ player.formatTime(player.currentTime()) }}</span>
         <input type="range" class="progress-bar flex-grow-1" [min]="0" [max]="player.duration() || 0"
@@ -71,12 +105,15 @@
     </div>
 
     <!-- Right: Volume -->
+    <!-- Volume is 0 → mute icon
+        Volume is between 1-49 → low volume icon
+          Volume is 50+ → full volume icon -->
     <div class="d-flex align-items-center gap-2" style="min-width: 150px; justify-content: flex-end;">
       <i class="bi" [class.bi-volume-mute-fill]="player.volume() === 0"
-         [class.bi-volume-down-fill]="player.volume() > 0 && player.volume() < 50"
-         [class.bi-volume-up-fill]="player.volume() >= 50"></i>
-      <input type="range" class="volume-bar" min="0" max="100" [value]="player.volume()"
-        (input)="onVolume($event)" style="width: 90px;">
+        [class.bi-volume-down-fill]="player.volume() > 0 && player.volume() < 50"
+        [class.bi-volume-up-fill]="player.volume() >= 50"></i>
+      <input type="range" class="volume-bar" min="0" max="100" [value]="player.volume()" (input)="onVolume($event)"
+        style="width: 90px;">
     </div>
 
   </div>

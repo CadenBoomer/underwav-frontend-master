@@ -3,6 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { AuthService } from './auth.service';
 
+
+// This is the central Track interface that gets exported and used across all your components.
+//  Only id, title, and filename are required — everything else is optional with ?. 
+// Notice it's exported (export interface) so other files can import it. This is why you see import { Track } 
+// from '../../services/media.service' in almost every component.
 export interface Track {
   id: number;
   user_id?: number;
@@ -22,6 +27,8 @@ export interface Track {
   genres?: { id: number; name: string }[];
 }
 
+// Defines what the backend returns when fetching paginated tracks — the 
+// array of tracks plus pagination metadata. Used in getRecentlyUploaded() and the dashboard.
 export interface PaginatedTracks {
   tracks: Track[];
   total: number;
@@ -34,6 +41,15 @@ export class MediaService {
   private apiBase = 'http://localhost:3000/api';
 
   constructor(private http: HttpClient, private auth: AuthService) { }
+
+
+//   .pipe() and map(). Instead of subscribing and processing the data in a callback, this processes it in the service 
+// before it even reaches the component.
+// .pipe() — lets you chain RxJS operators onto an observable
+// map() — transforms the data as it flows through. Here it spreads the response with ...res and rebuilds the tracks 
+// array with cover URLs already built
+// So by the time the component receives the data, cover URLs are already set — the component doesn't need to do the 
+// mapping itself. This is cleaner than what the discover and home components do directly in their HTTP calls.
 
   getRecentlyUploaded(page: number = 1): Observable<PaginatedTracks> {
     return this.http.get<PaginatedTracks>(
@@ -52,6 +68,8 @@ export class MediaService {
     );
   }
 
+  // All follow the same .pipe(map(...)) pattern — fetch data, build cover URLs in the service, 
+  // return the transformed observable. The public ones have no auth headers since they don't require login.
   getLikedTracks(): Observable<Track[]> {
     return this.http.get<Track[]>(`${this.apiBase}/profile/likes`, this.auth.getAuthHeaders())
       .pipe(

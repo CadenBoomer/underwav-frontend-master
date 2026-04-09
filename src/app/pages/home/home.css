@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
+/* :host targets the component itself. Defining colors as variables here means you just write var(--accent) 
+anywhere in the CSS instead of repeating #833dce everywhere. 
+If you ever want to change the purple you only update it in one place. */
 :host {
   --accent: #833dce;
   --border: #2a2a2a;
@@ -8,21 +11,29 @@
   --input-bg: #1e1e1e;
 }
 
+/* Sets DM Sans as the default font for the whole page. The padding is 0 on top, 4rem on the sides, 
+and 8rem on the bottom so content doesn't get hidden under the fixed player bar. */
 .home-page {
   font-family: 'DM Sans', sans-serif;
   padding: 0 4rem 8rem;
 }
 
+/* Each section gets vertical padding for breathing room. 
+The border bottom draws a thin dark line between each section. */
 /* Sections */
 .home-section {
   padding: 3rem 0;
   border-bottom: 1px solid var(--border);
 }
 
+/* Adds space between the section title and whatever content is below it. */
 .section-header {
   margin-bottom: 1.5rem;
 }
 
+/* Big bold white heading using Syne. letter-spacing: -0.02em slightly tightens the spacing between 
+letters which gives 
+it a modern look. The margin adds a tiny gap below before the subtitle. */
 .section-title {
   font-family: 'Syne', sans-serif;
   font-weight: 700;
@@ -32,6 +43,7 @@
   margin: 0 0 0.25rem;
 }
 
+/* The small grey description under each heading. Muted color so it stays secondary to the title. */
 .section-sub {
   color: var(--muted);
   font-size: 0.85rem;
@@ -39,6 +51,9 @@
 }
 
 /* Continue Listening */
+/* Flex row so the cover image, track info, and play button sit side by side and are vertically centered. 
+Dark background with a subtle border and rounded corners. max-width: 
+500px stops it stretching too wide. The border color transition makes the hover effect animate smoothly. */
 .continue-card {
   display: flex;
   align-items: center;
@@ -52,10 +67,13 @@
   max-width: 500px;
 }
 
+/* On hover the border turns purple, giving a clear visual signal that the card is clickable. */
 .continue-card:hover {
   border-color: var(--accent);
 }
 
+/* Fixed size square cover art. object-fit: cover fills the square without stretching the image. 
+flex-shrink: 0 prevents it from squishing if the row gets tight. */
 .continue-cover {
   width: 56px;
   height: 56px;
@@ -64,21 +82,27 @@
   flex-shrink: 0;
 }
 
+/* Stretches to fill all remaining space between the cover image and the play button. */
 .continue-info {
   flex: 1;
 }
 
+/* White track title at medium font weight. */
 .continue-title {
   font-weight: 500;
   color: #fff;
   font-size: 0.95rem;
 }
 
+/* Smaller grey artist name sitting below the track title. */
 .continue-artist {
   color: var(--muted);
   font-size: 0.8rem;
 }
 
+/* Purple circle play button. border-radius: 
+50% makes it a perfect circle. Black icon on purple background. 
+flex-shrink: 0 stops it from squishing. */
 .continue-play-btn {
   background: var(--accent);
   color: #000;
@@ -91,6 +115,7 @@
   flex-shrink: 0;
 }
 
+/* Stacks all track rows vertically with a tiny 4px gap between each one. */
 /* Track rows */
 .tracks-grid {
   display: flex;
@@ -98,6 +123,8 @@
   gap: 4px;
 }
 
+/* Each track row is a flex row so thumbnail, track info, and play button sit side by side. 
+Rounded corners and a smooth background transition for the hover effect. */
 .track-row {
   display: flex;
   align-items: center;
@@ -108,14 +135,18 @@
   transition: background 0.15s;
 }
 
+/* Dark background fades in when you hover the row so it's clear which track you're about to click. */
 .track-row:hover {
   background: var(--input-bg);
 }
 
+/* When the row is hovered, this also makes the play button visible. 
+It targets the play button only when its parent row is being hovered. */
 .track-row:hover .track-play-btn {
   opacity: 1;
 }
 
+/* Small square cover thumbnail with slightly rounded corners. Same object-fit and flex-shrink as before. */
 .track-thumb {
   width: 44px;
   height: 44px;
@@ -124,6 +155,8 @@
   flex-shrink: 0;
 }
 
+/* track-meta is just a wrapper div that groups the track title and 
+artist name together so they stack vertically and sit next to the cover image. */
 .track-meta {
   flex: 1;
 }
@@ -139,6 +172,8 @@
   color: var(--muted);
 }
 
+/* Play button is invisible by default and only fades in when you hover the row. 
+Keeps the UI clean — buttons don't clutter every row until you actually need them. */
 .track-play-btn {
   background: var(--accent);
   color: #000;
@@ -154,12 +189,16 @@
 }
 
 /* Artists grid */
+/* flex-wrap: wrap means artist cards flow into a row and 
+automatically wrap onto the next line when there's no more space, rather than overflowing off screen. */
 .artists-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
 }
 
+/* Fixed width dark card with rounded corners. text-align: 
+center centers everything inside it. Border turns purple on hover same as the continue card. */
 .artist-card {
   background: var(--input-bg);
   border: 1px solid var(--border);
@@ -201,18 +240,25 @@
   padding: 1rem 0;
 }
 
+/* On screens smaller than 768px (phones/tablets), 
+the side padding shrinks from 4rem to 1.5rem so content isn't cramped on small screens. */
 @media (max-width: 768px) {
   .home-page {
     padding: 0 1.5rem 8rem;
   }
 }
 
+
+/* This is actually a second definition of .track-artist at the bottom of the file — 
+it overrides the earlier one. Adds a transition so the color change animates smoothly, and on hover turns 
+purple with an underline to signal it's a clickable link. */
 .track-artist {
   font-size: 0.8rem;
   color: #888;
   transition: color 0.2s;
 }
 
+/* Artist name turns purple and gets underlined on hover — visually signals it's a clickable link to their profile. */
 .track-artist:hover {
   color: #833dce;
   text-decoration: underline;

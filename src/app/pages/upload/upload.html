@@ -2,6 +2,8 @@
 
   <div class="upload-container">
 
+    <div *ngIf="message" class="upload-message">{{ message }}</div>
+
     <!-- Header -->
     <div class="upload-header mb-5">
       <h1 class="upload-title">Upload</h1>
@@ -11,6 +13,9 @@
     <div class="upload-layout">
 
       <!-- Left: Cover Preview -->
+       <!-- The visible drop zone div is just a styled button — clicking it triggers the hidden file input via 
+        coverInput.click(). #coverInput is a template reference variable — it gives you a direct handle to that input 
+        element so you can call .click() on it. Shows the preview image if one exists, otherwise shows the placeholder. -->
       <div class="cover-section">
         <div class="cover-drop" (click)="coverInput.click()">
           <img *ngIf="coverPreview" [src]="coverPreview" class="cover-preview" alt="Cover">
@@ -23,6 +28,8 @@
                (change)="onCoverChange($event)" accept="image/*" hidden />
 
         <!-- Audio Drop Zone -->
+         <!-- Same pattern as the cover — styled div triggers hidden input. [class.audio-selected] 
+          adds the purple border class when a file is selected. Shows the filename once selected. -->
         <div class="audio-drop" (click)="fileInput.click()"
              [class.audio-selected]="selectedFile">
           <span *ngIf="!selectedFile">♪ Select Audio File</span>
@@ -59,6 +66,7 @@
         </div>
 
         <!-- Genres -->
+     
         <div class="field-group">
           <label class="field-label">Genres</label>
           <div class="genre-bubbles mb-2">
@@ -67,6 +75,9 @@
               <button type="button" class="remove-btn" (click)="removeGenre(i)">×</button>
             </span>
           </div>
+              <!-- [ngValue]="genre" binds the entire genre object as the value instead of just a string — 
+          that's why currentGenre ends up as a full {id, name} object when selected. (change)="addGenre()" automatically 
+          adds the genre as soon as you select it. #genreSelect is the template reference passed to resetForm(). -->
           <select class="field-input field-select"
                   [(ngModel)]="currentGenre"
                   (change)="addGenre()" #genreSelect>
@@ -89,7 +100,9 @@
                       (click)="isPublic = false">Private</button>
             </div>
           </div>
-
+          <!-- Passes all three template references to uploadSong(). 
+           [disabled]="!selectedFile" disables the button until an audio file is selected. 
+           Ternary swaps button text while uploading. -->
           <button class="upload-btn"
                   (click)="uploadSong(fileInput, coverInput, genreSelect)"
                   [disabled]="!selectedFile">

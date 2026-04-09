@@ -1,26 +1,61 @@
+<!-- Very simple — just a card with two inputs and a button. Everything you've seen before:
+
+[(ngModel)] two way binding on both inputs
+(click)="login()" on the button
+routerLink="/signup" to navigate to signup -->
+
+
 <div class="auth-page">
   <div class="auth-card">
 
     <div class="auth-brand">Underwav</div>
-    <h1 class="auth-title">Welcome back</h1>
-    <p class="auth-sub">Sign in to your account</p>
 
-    <div class="field-group">
-      <label class="field-label">Email</label>
-      <input type="email" class="field-input" placeholder="you@example.com" [(ngModel)]="email">
-    </div>
+    <!-- Login View -->
+    <ng-container *ngIf="!showForgot">
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-sub">Sign in to your account</p>
 
-    <div class="field-group">
-      <label class="field-label">Password</label>
-      <input type="password" class="field-input" placeholder="••••••••" [(ngModel)]="password">
-    </div>
+      <div *ngIf="message" class="auth-message">{{ message }}</div>
 
-    <button class="auth-btn" (click)="login()">Sign In</button>
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input type="email" class="field-input" placeholder="you@example.com" [(ngModel)]="email">
+      </div>
 
-    <p class="auth-footer">
-      Don't have an account?
-      <a routerLink="/signup" class="auth-link">Sign up</a>
-    </p>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input type="password" class="field-input" placeholder="••••••••" [(ngModel)]="password">
+      </div>
+
+      <button class="auth-btn" (click)="login()">Sign In</button>
+
+      <p class="auth-footer">
+        <a class="auth-link" (click)="showForgot = true" style="cursor:pointer">Forgot password?</a>
+      </p>
+      <p class="auth-footer">
+        Don't have an account?
+        <a routerLink="/signup" class="auth-link">Sign up</a>
+      </p>
+    </ng-container>
+
+    <!-- Forgot Password View -->
+    <ng-container *ngIf="showForgot">
+      <h1 class="auth-title">Reset Password</h1>
+      <p class="auth-sub">Enter your email and we'll send a reset link</p>
+
+      <div *ngIf="message" class="auth-message">{{ message }}</div>
+
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input type="email" class="field-input" placeholder="you@example.com" [(ngModel)]="email">
+      </div>
+
+      <button class="auth-btn" (click)="forgotPassword()">Send Reset Link</button>
+
+      <p class="auth-footer">
+        <a class="auth-link" (click)="showForgot = false; message = ''" style="cursor:pointer">Back to Sign In</a>
+      </p>
+    </ng-container>
 
   </div>
 </div>

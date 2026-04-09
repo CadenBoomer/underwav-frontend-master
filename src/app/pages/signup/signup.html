@@ -5,6 +5,9 @@
     <h1 class="auth-title">Create account</h1>
     <p class="auth-sub">Start sharing your sound</p>
 
+    <!-- three [(ngModel)] bound inputs for username, email, and password. The button calls signup() on click. -->
+
+    <!-- Uses message. Better than using alert. -->
     <div *ngIf="message" class="auth-message">{{ message }}</div>
 
     <div class="field-group">

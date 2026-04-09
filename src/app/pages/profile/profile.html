@@ -1,7 +1,11 @@
 <div class="profile-page">
   <div class="profile-container">
+    <div *ngIf="message" class="profile-message">{{ message }}</div>
 
     <!-- Top: Avatar + Info -->
+    <!-- Same hidden file input pattern as upload. Three layer image stack — the actual avatar image, 
+      a decorative avatar-ring div, and the avatar-overlay that appears on hover. 
+      The || chain tries avatarPreview first (new photo), then user.avatar (saved photo), then falls back to the logo. -->
     <div class="profile-hero">
       <div class="avatar-section">
         <div class="avatar-wrap" (click)="avatarInput.click()">
@@ -15,11 +19,13 @@
 
       <div class="hero-info">
         <h1 class="hero-name">{{ user.username || 'Anonymous' }}</h1>
+        <!-- Only shows if at least one of city or country exists. -->
         <p class="hero-location" *ngIf="user.city || user.country">
           ◎ {{ user.city }} {{ user.country }}
         </p>
         <p class="hero-bio">{{ user.bio || 'No bio yet.' }}</p>
         <div class="hero-meta d-flex gap-4 mt-3">
+          <!-- Email only shows if BOTH email exists AND show_email is true — the user controls this with the visibility toggle. -->
           <div class="meta-item" *ngIf="user.email && user.show_email">
             <span class="meta-label">Email</span>
             <span class="meta-value">{{ user.email }}</span>
@@ -42,6 +48,8 @@
     <!-- Followers / Following -->
     <div class="profile-section">
       <div class="follow-tabs">
+        <!-- Clicking sets followTab to the string directly in the template — no method 
+         needed since it's just a simple assignment. The active class is added when followTab matches the button's tab name. -->
         <button class="follow-tab-btn" [class.follow-tab-active]="followTab === 'followers'"
           (click)="followTab = 'followers'">
           Followers <span class="follow-count">{{ followers.length }}</span>
@@ -58,6 +66,8 @@
           <img [src]="follower.avatar || '/UnderwavLogo1.png'" class="user-thumb" alt="avatar">
           <div class="user-name" [routerLink]="['/profile', follower.id]" style="cursor:pointer">{{ follower.username }}
           </div>
+          <!-- Button text and style changes based on isFollowing — shows "Following" 
+           in purple if you follow them back, "Follow Back" in grey if you don't. -->
           <button class="unfollow-btn" [class.following-back]="follower.isFollowing"
             (click)="toggleFollowBack(follower)">
             {{ follower.isFollowing ? 'Following' : 'Follow Back' }}
@@ -67,6 +77,7 @@
       </div>
 
       <!-- Following List -->
+      <!-- Each list only renders when its tab is active. -->
       <div *ngIf="followTab === 'following'" class="users-grid">
         <div *ngFor="let follow of following" class="user-row">
           <img [src]="follow.avatar || '/UnderwavLogo1.png'" class="user-thumb" alt="avatar">
@@ -84,6 +95,10 @@
     <!-- Edit Profile -->
     <div class="profile-section">
       <h2 class="section-title">Edit Profile</h2>
+      <!-- New pattern here — #profileForm="ngForm" creates a template reference to Angular's form object. 
+       profileForm.value is an object containing all the form field values keyed by their name attributes. 
+       (ngSubmit) fires when the form is submitted — better than (click) on the button for forms since it also
+        handles pressing Enter. -->
       <form #profileForm="ngForm" (ngSubmit)="saveProfile(profileForm.value)">
         <div class="fields-grid">
           <div class="field-group">
@@ -93,6 +108,8 @@
           <div class="field-group">
             <label class="field-label">Email</label>
             <div class="field-with-toggle">
+              <!-- Email uses [value] instead of [(ngModel)] and is disabled — the user can't 
+               edit it, it's just for display. The hint text explains they need to contact support to change it. -->
               <input type="email" class="field-input" [value]="user.email" disabled>
               <button type="button" class="visibility-btn" [class.visibility-active]="user.show_email"
                 (click)="user.show_email = !user.show_email">
@@ -101,7 +118,8 @@
             </div>
             <small class="field-hint">Contact support to change your email. Toggle to show/hide on public
               profile.</small>
-            <!-- hidden input so ngForm picks up show_email -->
+            <!-- A hidden input so Angular's form picks up show_email in profileForm.value even though the
+              actual toggle is a button, not an input. -->
             <input type="hidden" name="show_email" [(ngModel)]="user.show_email">
           </div>
           <div class="field-group">
@@ -144,6 +162,8 @@
         <div class="fields-grid">
           <div class="field-group">
             <label class="field-label">Current Password</label>
+            <!-- Uses just ngModel without [()] two-way binding — this is one-way, Angular tracks the
+              value for form submission but doesn't need to pre-fill it. -->
             <input type="password" class="field-input" name="currentPassword" ngModel required>
           </div>
           <div class="field-group">
@@ -152,6 +172,10 @@
           </div>
         </div>
         <button type="submit" class="btn-secondary-action mt-4">Update Password</button>
+        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: #777;">
+          Forgot your password?
+          <a routerLink="/login" style="color: #833dce; text-decoration: none;">Reset it here</a>
+        </p>
       </form>
     </div>
 

@@ -1,3 +1,4 @@
+<!-- The entire page is wrapped in *ngIf="user" — nothing renders until the user data has loaded. -->
 <div class="public-profile-page" *ngIf="user">
 
   <!-- Hero -->
@@ -27,6 +28,7 @@
       </div>
 
       <!-- Stats -->
+       <!-- Stats are clickable and switch tabs — clicking "Followers" count jumps to the followers tab. -->
       <div class="hero-stats">
         <div class="stat-item" (click)="setTab('tracks')">
           <span class="stat-value">{{ tracks.length }}</span>
@@ -44,6 +46,7 @@
 
 
       <!-- Follow Button -->
+       <!-- Follow button only shows if logged in AND not your own profile. Style and text changes based on isFollowing. -->
       <button *ngIf="isLoggedIn && !isOwnProfile" class="follow-btn" [class.follow-btn-active]="isFollowing"
         (click)="toggleFollow()">
         {{ isFollowing ? 'Following' : 'Follow' }}
@@ -62,6 +65,8 @@
   </div>
 
   <!-- Tracks Tab -->
+   <!-- Each track is wrapped in a track-wrap div so the comments section can sit directly 
+    below the track row. Multiple click handlers on the image — calls logTrack then setQueue. -->
   <div class="tab-content" *ngIf="activeTab === 'tracks'">
     <div class="tracks-grid">
       <div *ngFor="let track of tracks; let i = index" class="track-wrap">
@@ -69,7 +74,7 @@
         <!-- Track Row -->
         <div class="track-row">
           <img [src]="track.coverUrl || '/UnderwavLogo1.png'" class="track-thumb" alt="cover"
-            (click)="logTrack(tracks[i]); player.setQueue(tracks, i)">
+            (click)="player.setQueue(tracks, i)">
           <div class="track-meta" (click)="player.setQueue(tracks, i)">
             <div class="track-name">{{ track.title }}</div>
             <div class="track-artist">{{ user.username }}</div>
@@ -78,6 +83,8 @@
             <span>👁 {{ track.views || 0 }}</span>
             <span>💬 {{ track.comment_count || 0 }}</span>
           </div>
+          <!-- If logged in, shows a clickable like button. If not logged in, shows a non-interactive like 
+           count. Two separate elements swapping based on login state. -->
           <button class="like-btn" [class.like-btn-active]="track.isLiked" (click)="toggleLike(track)"
             *ngIf="isLoggedIn">
             {{ track.isLiked ? '❤️' : '🤍' }} {{ track.likes_count || 0 }}
@@ -112,6 +119,7 @@
                   (click)="toggleCommentLike(comment)">
                   ♥ {{ comment.likes_count || 0 }}
                 </button>
+                <!-- Delete button only shows on comments where canDelete is true — meaning only YOUR own comments. -->
                 <button class="comment-delete-btn" *ngIf="comment.canDelete"
                   (click)="deleteComment(track, comment)">✕</button>
               </div>
@@ -147,6 +155,8 @@
   </div> -->
 
   <!-- Followers Tab -->
+   <!-- Follow button only shows if logged in AND the user in the list isn't YOU —
+     follower.id !== currentUserId prevents showing a follow button for yourself in the list. -->
   <div class="tab-content" *ngIf="activeTab === 'followers'">
     <div class="users-grid">
       <div *ngFor="let follower of followers" class="user-row">
